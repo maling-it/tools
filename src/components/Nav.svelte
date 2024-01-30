@@ -42,7 +42,7 @@
             </button>
             <ThemeSwitcher />
         </div>
-        <a class="navbar-brand" href="/">
+        <a class="navbar-brand" href="{base}">
             <img src="{base}/favicon.png" alt="Logo" width="24" height="24" />
         </a>
         <CoreSwitcher />
@@ -56,7 +56,7 @@
     <div
         class="offcanvas-header border-bottom border-secondary border-opacity-25"
     >
-        <a class="sidebar-brand font-weight-bolder" href="/"> SvelteKit </a>
+        <a class="sidebar-brand font-weight-bolder" href="{base}"> SvelteKit </a>
         <span class="d-none d-md-inline-block">
             <ThemeSwitcher />
         </span>
