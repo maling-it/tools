@@ -6,6 +6,17 @@ const config = {
 		adapter: adapter(),
 		paths: {
 			base: "/tools"
+		},
+		prerender: {
+			handleHttpError: ({ path, referrer, message }) => {
+				// Ignore deliberate link to shiny 404 page
+				if (path === '/not-found' && referrer === '/tools/error') {
+					return;
+				}
+
+				// Otherwise fail the build
+				throw new Error(message);
+			}
 		}
 	},
 	preprocess: vitePreprocess()
