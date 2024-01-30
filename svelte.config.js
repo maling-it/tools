@@ -10,7 +10,7 @@ const config = {
 		prerender: {
 			handleHttpError: ({ path, referrer, message }) => {
 				// Ignore deliberate link to shiny 404 page
-				if (path === '/not-found' && referrer === '/tools/error') {
+				if (path === '/404' && referrer === '/tools/error') {
 					return;
 				}
 
