@@ -16,7 +16,6 @@
         document.documentElement.setAttribute("data-bs-core", core);
         setStoredCore(core);
     };
-
     const showActiveCore = (core) => {
         const coreSwitcher = document.querySelector("#bd-core");
 
