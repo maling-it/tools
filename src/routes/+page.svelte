@@ -1,16 +1,18 @@
 <script>
-    import ModalBody from "../components/ModalBody.svelte";
-    import ModalBtn from "../components/ModalBtn.svelte";
+    import { base } from '$app/paths'
 </script>
 
 <svelte:head>
     <title>Home</title>
 </svelte:head>
 
-<h1>Welcome to SvelteKit</h1>
-<p>
-    <ModalBtn ModalId="myModal" modalName="Open Modal" />
-
-    <ModalBody ModalId="myModal" ModalHeader="Hello WOrld">Content of the body</ModalBody>
-    Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation
-</p>
+<div class="card p-3">
+    <img src="{base}/favicon.png" width="68" class="d-block flex-shrink-0 me-1 img-fluid" alt="Logo">
+    <h2 class="card-title">Wlecome to mools</h2>
+    <div class="card-body">
+        <p>
+            Online tools website, I don't know what to write here, maybe you can contribute?
+        </p>
+        or more details about mools can be read here
+    </div>
+</div>
