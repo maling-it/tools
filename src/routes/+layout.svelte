@@ -1,7 +1,10 @@
 <script>
     import "halfmoon/css/halfmoon.min.css";
     import "halfmoon/css/cores/halfmoon.cores.css";
+    import "../app.css"
     import Nav from "../components/Nav.svelte";
+    import Navbar from "../components/Navbar.svelte";
+    import Sidebar from "../components/Sidebar.svelte";
     import "bootstrap-icons/font/bootstrap-icons.css";
     import { onMount, afterUpdate } from "svelte";
     import {base} from "$app/paths";
@@ -25,7 +28,8 @@
 <svelte:head>
     <link rel="icon" href="{base}/favicon.png" />
 </svelte:head>
-<Nav />
+<Sidebar />
+<Navbar />
 <div class="container-md px-3 px-sm-4 px-xl-5">
     <slot />
 </div>
