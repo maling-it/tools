@@ -36,7 +36,7 @@
             <ThemeSwitcher />
         </div>
         <a
-            href="/"
+            href="{base}/"
             class="navbar-brand d-flex align-items-center d-lg-none ms-auto ms-md-0"
         >
             <img
