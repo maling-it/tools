@@ -2,7 +2,6 @@
     import "halfmoon/css/halfmoon.min.css";
     import "halfmoon/css/cores/halfmoon.cores.css";
     import "../app.css"
-    import Nav from "../components/Nav.svelte";
     import Navbar from "../components/Navbar.svelte";
     import Sidebar from "../components/Sidebar.svelte";
     import "bootstrap-icons/font/bootstrap-icons.css";
