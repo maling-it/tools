@@ -66,8 +66,7 @@
         aria-expanded="false"
         data-bs-auto-close="outside"
     >
-        <i class="bi bi-brush flex-shrink-0" style="width: 22px;" />
-        Theme
+        <i class="bi bi-brush flex-shrink-0" />
     </button>
     <div
         class="core-picker-dropdown-menu dropdown-menu dropdown-menu-end p-0"
