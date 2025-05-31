@@ -29,6 +29,6 @@
 </svelte:head>
 <Sidebar />
 <Navbar />
-<div class="container-md px-3 px-sm-4 px-xl-5">
+<div class="container-md px-3 py-4 px-sm-4 px-xl-5">
     <slot />
 </div>
