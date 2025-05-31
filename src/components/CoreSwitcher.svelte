@@ -1,6 +1,8 @@
 <script>
     import { onMount } from "svelte";
 
+    let selectedCore = "default";
+
     const setStoredCore = (core) => localStorage.setItem("core", core);
 
     const getPreferredCore = () => {
@@ -8,53 +10,24 @@
         if (storedCore) {
             return storedCore;
         }
-
         return "default";
     };
 
     const setCore = (core) => {
         document.documentElement.setAttribute("data-bs-core", core);
         setStoredCore(core);
-    };
-    const showActiveCore = (core) => {
-        const coreSwitcher = document.querySelector("#bd-core");
-
-        if (!coreSwitcher) {
-            return;
-        }
-
-        const btnToActive = coreSwitcher.querySelector(
-            `[data-bs-core-value="${core}"]`
-        );
-
-        if (!btnToActive) {
-            return;
-        }
-
-        document.querySelectorAll("[data-bs-core-value]").forEach((element) => {
-            element.classList.remove("active");
-            element.setAttribute("aria-pressed", "false");
-        });
-
-        btnToActive.classList.add("active");
-        btnToActive.setAttribute("aria-pressed", "true");
+        selectedCore = core;
     };
 
     const getStoredCore = () => localStorage.getItem("core");
 
+    const handleCoreChange = (core) => {
+        setCore(core);
+    };
+
     onMount(() => {
-        setCore(getPreferredCore());
-
-        showActiveCore(getPreferredCore());
-
-        document.querySelectorAll("[data-bs-core-value]").forEach((toggle) => {
-            toggle.addEventListener("click", () => {
-                const core = toggle.getAttribute("data-bs-core-value");
-                setStoredCore(core);
-                setCore(core);
-                showActiveCore(core);
-            });
-        });
+        selectedCore = getPreferredCore();
+        setCore(selectedCore);
     });
 </script>
 
@@ -83,8 +56,8 @@
                             class="btn-check"
                             id="default-core-2"
                             autocomplete="off"
-                            on:change={() => setCore("default")}
-                            checked
+                            bind:group={selectedCore}
+                            on:change={() => handleCoreChange("default")}
                         />
                         <label
                             class="btn text-start d-block w-100 py-2 px-3"
@@ -113,7 +86,8 @@
                             class="btn-check"
                             id="modern-core-2"
                             autocomplete="off"
-                            on:change={() => setCore("modern")}
+                            bind:group={selectedCore}
+                            on:change={() => handleCoreChange("modern")}
                         />
                         <label
                             class="btn text-start d-block w-100 py-2 px-3"
@@ -143,7 +117,8 @@
                             class="btn-check"
                             id="elegant-core-2"
                             autocomplete="off"
-                            on:change={() => setCore("elegant")}
+                            bind:group={selectedCore}
+                            on:change={() => handleCoreChange("elegant")}
                         />
                         <label
                             class="btn text-start d-block w-100 py-2 px-3"
