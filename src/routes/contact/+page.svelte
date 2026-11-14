@@ -152,7 +152,7 @@
 
 <!-- Statistics Section -->
 <section class="mb-5">
-    <div class="card bg-light">
+    <div class="card bg-body-tertiary">
         <div class="card-body text-center">
             <h3 class="h5 mb-4">Project Statistics</h3>
             <div class="row">

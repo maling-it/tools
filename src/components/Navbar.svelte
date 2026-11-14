@@ -12,8 +12,8 @@
             const response = await fetch(
                 "https://api.github.com/repos/maling-it/tools",
             );
-            const data = await response.json();
-            repoData = data;
+            if (!response.ok) return;
+            repoData = await response.json();
         } catch (error) {
             console.error("Error fetching data:", error);
         }
@@ -30,7 +30,7 @@
                 class="btn btn-secondary btn-square"
                 aria-label="Toggle sidebar"
             >
-                <i class="bi bi-layout-sidebar" aria-hidden="true" />
+                <i class="bi bi-layout-sidebar" aria-hidden="true"></i>
             </button>
 
             <ThemeSwitcher />
@@ -52,7 +52,7 @@
             class="d-none d-lg-block text-truncate"
             style="color: hsla(var(--bs-emphasis-color-hsl), 0.7); letter-spacing: 1px;"
         >
-            {base}{page.route.id}
+            {page.url.pathname}
         </div>
         <div class="btn-group ms-auto d-md-none">
             <div class="btn-group">
@@ -67,7 +67,7 @@
                 aria-expanded="false"
                 aria-label="Toggle navigation"
             >
-                <i class="bi bi-list" aria-hidden="true" />
+                <i class="bi bi-list" aria-hidden="true"></i>
             </button>
         </div>
         <div class="collapse navbar-collapse" id="mools-navbar-collapse">
@@ -86,15 +86,13 @@
                             target="_blank"
                             rel="noreferrer"
                         >
-                            <i
-                                class="bi bi-github flex-shrink-0"
+                            <i class="bi bi-github flex-shrink-0"
                                 style="width: 20px;"
-                                aria-hidden="true"
-                            />
+                                aria-hidden="true"></i>
                             Star
                         </a>
                         <a
-                            href=" {repoData.html_url}/stargazers"
+                            href="{repoData.html_url}/stargazers"
                             class="btn btn-secondary flex-grow-1 text-nowrap"
                             id="github-stars-count"
                             target="_blank"
@@ -102,8 +100,6 @@
                         >
                             {repoData.stargazers_count}</a
                         >
-                    {:else}
-                        Loading
                     {/if}
                 </div>
             </div>

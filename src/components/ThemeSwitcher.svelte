@@ -51,8 +51,9 @@
 <button
     type="button"
     class="btn btn-secondary"
+    aria-label="Toggle theme"
     data-bs-auto-close="outside"
     on:click={toggleTheme}
 >
-    <i class="bi bi-moon" />
+    <i class="bi bi-moon"></i>
 </button>
