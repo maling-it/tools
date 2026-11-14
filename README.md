@@ -67,11 +67,14 @@ Requirements: [Bun](https://bun.sh) and Node.js 22.17 or newer.
 bun install
 bun run dev      # dev server on http://localhost:6969/tools/
 bun run test     # unit tests (Vitest)
+bun run test:e2e # browser tests (Playwright), run `bun run build` first
 bun run build    # static build into build/
 bun run preview  # serve the production build
 ```
 
-Pushes to `master` run the tests, build the site and deploy it to GitHub Pages (see `.github/workflows/deploy.yml`).
+Pull requests run the unit tests, the build and the browser tests (`.github/workflows/ci.yml`). Pushes to `master` run the same checks and then deploy the site to GitHub Pages (`.github/workflows/deploy.yml`). The browser tests open every page in Chrome, so a broken page blocks the deploy.
+
+The browser tests use the Google Chrome installed on your machine; set `CHROME_PATH` to use a different browser.
 
 ### Project layout
 
