@@ -1,5 +1,6 @@
 <script>
     import { resolve } from '$app/paths';
+    import { categories } from '#lib/tools.js';
 
     let { tool, showCategory = false } = $props();
 </script>
@@ -14,7 +15,7 @@
                 <div class="flex-grow-1">
                     <h5 class="card-title mb-1">{tool.title}</h5>
                     {#if showCategory}
-                        <span class="badge bg-secondary">{tool.category}</span>
+                        <span class="badge bg-secondary">{categories.find((c) => c.id === tool.category)?.name ?? tool.category}</span>
                     {/if}
                 </div>
             </div>

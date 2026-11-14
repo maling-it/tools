@@ -1,50 +1,51 @@
 <script>
     import { onMount } from "svelte";
 
-    const getStoredTheme = () => localStorage.getItem("theme");
-    const setStoredTheme = (theme) => localStorage.setItem("theme", theme);
+    let theme = $state("dark");
 
-    const getPreferredTheme = () => {
-        const storedTheme = getStoredTheme();
-        if (storedTheme) {
-            return storedTheme;
-        }
-
-        return window.matchMedia("(prefers-color-scheme: dark)").matches
-            ? "dark"
-            : "light";
-    };
-
-    const setTheme = (theme) => {
-        if (
-            theme === "auto" &&
-            window.matchMedia("(prefers-color-scheme: dark)").matches
-        ) {
-            document.documentElement.setAttribute("data-bs-theme", "dark");
-        } else {
-            document.documentElement.setAttribute("data-bs-theme", theme);
+    const readStoredTheme = () => {
+        try {
+            return localStorage.getItem("theme");
+        } catch {
+            return null;
         }
     };
+
+    const preferredTheme = () =>
+        readStoredTheme() ?? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+
+    const applyTheme = (value) => document.documentElement.setAttribute("data-bs-theme", value);
 
     const toggleTheme = () => {
-        const currentTheme = getStoredTheme() || getPreferredTheme();
-        const newTheme = currentTheme === "dark" ? "light" : "dark";
-
-        setStoredTheme(newTheme);
-        setTheme(newTheme);
+        const next = theme === "dark" ? "light" : "dark";
+        try {
+            localStorage.setItem("theme", next);
+        } catch {
+            // Storage can be unavailable (private mode); the choice then only lasts for this visit.
+        }
+        applyTheme(next);
     };
 
     onMount(() => {
-        setTheme(getPreferredTheme());
+        applyTheme(preferredTheme());
 
-        window
-            .matchMedia("(prefers-color-scheme: dark)")
-            .addEventListener("change", () => {
-                const storedTheme = getStoredTheme();
-                if (storedTheme !== "light" && storedTheme !== "dark") {
-                    setTheme(getPreferredTheme());
-                }
-            });
+        // Two switchers exist (sidebar and navbar), so follow the attribute instead of local clicks.
+        const observer = new MutationObserver(() => {
+            theme = document.documentElement.getAttribute("data-bs-theme") ?? "dark";
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-bs-theme"] });
+        theme = document.documentElement.getAttribute("data-bs-theme") ?? "dark";
+
+        const media = window.matchMedia("(prefers-color-scheme: dark)");
+        const onSystemChange = () => {
+            if (!readStoredTheme()) applyTheme(preferredTheme());
+        };
+        media.addEventListener("change", onSystemChange);
+
+        return () => {
+            observer.disconnect();
+            media.removeEventListener("change", onSystemChange);
+        };
     });
 </script>
 
@@ -52,8 +53,8 @@
     type="button"
     class="btn btn-secondary"
     aria-label="Toggle theme"
-    data-bs-auto-close="outside"
-    on:click={toggleTheme}
+    title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+    onclick={toggleTheme}
 >
-    <i class="bi bi-moon"></i>
+    <i class="bi {theme === 'dark' ? 'bi-sun' : 'bi-moon'}"></i>
 </button>

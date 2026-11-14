@@ -1,6 +1,7 @@
 <script>
     import { resolve } from "$app/paths";
     import { page } from "$app/state";
+    import { afterNavigate } from "$app/navigation";
     import ThemeSwitcher from "./ThemeSwitcher.svelte";
     import { categories, toolsIn } from "#lib/tools.js";
     import { base } from "#lib/paths.js";
@@ -36,6 +37,12 @@
 
     const isActive = (path) => page.url.pathname === `${base}${path}/`;
 
+    // On small screens the sidebar is an offcanvas; close it after choosing a page.
+    afterNavigate(() => {
+        const sidebar = document.getElementById("sidebar");
+        if (sidebar?.classList.contains("show")) sidebar.querySelector(".btn-close")?.click();
+    });
+
     const onKeydown = (event) => {
         const typing = ["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName);
         if (event.key === "/" && !typing && !event.metaKey && !event.ctrlKey) {
@@ -47,18 +54,18 @@
 
 <svelte:window onkeydown={onKeydown} />
 
-<nav class="sidebar offcanvas-start offcanvas-md" tabindex="-1" id="sidebar">
+<nav class="sidebar offcanvas-start offcanvas-lg" tabindex="-1" id="sidebar">
     <div class="offcanvas-header border-bottom border-secondary border-opacity-25">
         <a href="{base}/" class="sidebar-brand d-flex align-items-center me-auto">
             <img src="{base}/favicon.png" alt="Logo" width="28" height="28" class="d-block flex-shrink-0 me-1" />
             Mools
         </a>
-        <span class="d-none d-md-inline-block">
+        <span class="d-none d-lg-inline-block">
             <ThemeSwitcher />
         </span>
         <button
             type="button"
-            class="btn-close d-md-none"
+            class="btn-close d-lg-none"
             data-bs-dismiss="offcanvas"
             aria-label="Close"
             data-bs-target="#sidebar"
