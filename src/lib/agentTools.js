@@ -9,6 +9,8 @@ import { basicAuthHeader, bcryptCompare, bcryptHash, decodeJwt, hmac, parseUrl, 
 import { jsonToToml, jsonToXml, jsonToYaml, tomlToJson, tomlToYaml, yamlToJson, yamlToToml } from './formats.js';
 import { explainCron, formatSql, jsonDiff, markdownToHtml, nextCronRuns, textDiff } from './formatters.js';
 import { HTTP_STATUS, MIME_TYPES } from './reference.js';
+import { PROMPTS } from './prompts.js';
+import { COMMIT_TYPES, RULE_FORMATS, buildCommitMessage, buildDesignMd, buildLlmsTxt, buildMcpConfig, buildPrompt, buildRulesFile, estimateCost, estimateTokens, extractVariables, fillTemplate } from './vibe.js';
 import { caseConverters, escapeHtml, escapeJs, escapeXml, replaceText, textStats, unescapeHtml, unescapeJs, unescapeXml, urlDecode, urlEncode } from './textUtils.js';
 
 const string = (description, extra = {}) => ({ type: 'string', description, ...extra });
@@ -469,6 +471,69 @@ export const agentTools = [
         description: 'Look up MIME types by file extension or by type text.',
         inputSchema: object({ query: string('Extension such as png or text such as "application/json"') }),
         run: ({ query }) => out(MIME_TYPES.filter((m) => `${m.extension} ${m.type}`.includes(String(query).trim().toLowerCase().replace(/^\./, ''))))
+    },
+    {
+        name: 'estimate_tokens',
+        description: 'Roughly estimate the LLM token count (and optional input cost) of a text. Approximate, not model-exact.',
+        inputSchema: object({ text: string('Text to measure'), pricePerMillionTokens: number('Optional input price in dollars per 1M tokens') }, ['text']),
+        run: ({ text, pricePerMillionTokens }) => {
+            const stats = estimateTokens(text);
+            return out(pricePerMillionTokens ? { ...stats, estimatedCost: estimateCost(stats.tokens, pricePerMillionTokens) } : stats);
+        }
+    },
+    {
+        name: 'build_commit_message',
+        description: 'Format a Conventional Commits message.',
+        inputSchema: object({ type: string('Commit type', { enum: COMMIT_TYPES }), description: string('Short description'), scope: string('Optional scope'), body: string('Optional body'), breaking: bool('Mark as breaking change'), breakingNote: string('Breaking change explanation'), issues: string('Issue numbers separated by commas') }, ['type', 'description']),
+        run: (args) => buildCommitMessage(args)
+    },
+    {
+        name: 'build_agents_file',
+        description: 'Generate an AGENTS.md, CLAUDE.md, Cursor rule, Copilot instructions or Windsurf rules file. Returns the target filename and the content.',
+        inputSchema: object({ format: string('Output format', { enum: Object.keys(RULE_FORMATS) }), project: string('Project name'), description: string('What the project does'), stack: string('Tech stack, one per line'), installCommand: string('Install command'), devCommand: string('Dev server command'), testCommand: string('Test command'), lintCommand: string('Lint command'), buildCommand: string('Build command'), structure: string('Project structure'), conventions: string('Conventions, one per line'), always: string('Always do, one per line'), never: string('Never do, one per line') }, ['project']),
+        run: (a) => {
+            const file = buildRulesFile({ format: a.format ?? 'agents', project: a.project, description: a.description ?? '', stack: a.stack ?? '', commands: { install: a.installCommand, dev: a.devCommand, test: a.testCommand, lint: a.lintCommand, build: a.buildCommand }, structure: a.structure ?? '', conventions: a.conventions ?? '', dos: a.always ?? '', donts: a.never ?? '' });
+            return out(file);
+        }
+    },
+    {
+        name: 'build_prompt',
+        description: 'Assemble a structured prompt from a role, context, task, constraints, output format and examples.',
+        inputSchema: object({ role: string('Role'), context: string('Context'), task: string('Task'), constraints: string('Constraints, one per line'), outputFormat: string('Output format'), examples: string('Examples'), style: string('Formatting style', { enum: ['markdown', 'xml', 'plain'] }) }, []),
+        run: (args) => buildPrompt(args)
+    },
+    {
+        name: 'search_prompts',
+        description: 'Search the Mools prompt library for AI-assisted coding. Optionally fill {{placeholders}} via the values object.',
+        inputSchema: object({ query: string('Search words, e.g. "bug" or "security"'), values: { type: 'object', description: 'Placeholder values keyed by name', additionalProperties: { type: 'string' } } }, ['query']),
+        run: ({ query, values = {} }) =>
+            out(
+                PROMPTS.filter((p) => `${p.title} ${p.category} ${p.prompt}`.toLowerCase().includes(String(query).toLowerCase())).map((p) => ({
+                    id: p.id,
+                    title: p.title,
+                    category: p.category,
+                    placeholders: extractVariables(p.prompt),
+                    prompt: fillTemplate(p.prompt, values)
+                }))
+            )
+    },
+    {
+        name: 'build_design_md',
+        description: 'Generate a DESIGN.md that describes a visual identity for coding agents.',
+        inputSchema: object({ name: string('Product name'), description: string('Description'), colors: { type: 'array', description: 'Palette', items: object({ name: string('Role'), hex: string('Hex value') }) }, headingFont: string('Heading font'), bodyFont: string('Body font'), radius: string('Corner radius'), spacing: string('Spacing scale'), tone: string('Tone and feel'), components: string('Component notes'), dos: string('Do, one per line'), donts: string('Dont, one per line') }, ['name']),
+        run: (args) => buildDesignMd(args)
+    },
+    {
+        name: 'build_llms_txt',
+        description: 'Generate an llms.txt file. Sections use "## Name" lines followed by "Title | URL | note" link lines.',
+        inputSchema: object({ title: string('Site name'), summary: string('One-line summary'), details: string('Extra details'), sections: string('Sections and links') }, ['title']),
+        run: (args) => buildLlmsTxt(args)
+    },
+    {
+        name: 'build_mcp_config',
+        description: 'Generate the config that registers an MCP server with Claude Desktop, Cursor, VS Code or Claude Code.',
+        inputSchema: object({ client: string('Client', { enum: ['claude-desktop', 'cursor', 'vscode', 'claude-code'] }), name: string('Server name'), command: string('Command to run'), args: string('Arguments, one per line'), env: string('Environment variables as NAME=value lines') }, ['client', 'command']),
+        run: (args) => buildMcpConfig(args)
     },
     {
         name: 'qr_code_svg',

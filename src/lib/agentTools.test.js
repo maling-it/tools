@@ -40,6 +40,17 @@ describe('agent tools', () => {
         await expect(callAgentTool('convert_data_format', { text: 'a', from: 'xml', to: 'json' })).rejects.toThrow();
     });
 
+    it('runs vibe coding tools', async () => {
+        expect(JSON.parse(await callAgentTool('estimate_tokens', { text: 'hello world', pricePerMillionTokens: 1000000 })).estimatedCost).toBeGreaterThan(0);
+        expect(await callAgentTool('build_commit_message', { type: 'fix', description: 'handle null' })).toBe('fix: handle null');
+        expect(JSON.parse(await callAgentTool('build_agents_file', { format: 'cursor', project: 'X' })).filename).toBe('.cursor/rules/project.mdc');
+        expect(await callAgentTool('build_prompt', { task: 'Do it', style: 'xml' })).toContain('<task>');
+        const found = JSON.parse(await callAgentTool('search_prompts', { query: 'security', values: { target: 'src/api' } }));
+        expect(found.length).toBeGreaterThan(0);
+        expect(found.find((p) => p.id === 'security-audit').prompt).toContain('src/api');
+        expect(await callAgentTool('build_mcp_config', { client: 'claude-code', command: 'node', name: 'x' })).toBe('claude mcp add x -- node');
+    });
+
     it('rejects unknown tools and missing arguments', async () => {
         await expect(callAgentTool('nope')).rejects.toThrow('Unknown tool');
         await expect(callAgentTool('base64', { text: 'x' })).rejects.toThrow('Missing required argument "mode"');

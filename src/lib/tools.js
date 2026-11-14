@@ -51,6 +51,13 @@ export const categories = [
         icon: 'controller'
     },
     {
+        id: 'ai',
+        name: 'AI & Vibe Coding',
+        sidebarName: 'AI & Vibe Coding',
+        description: 'Prompts, rules files and helpers for coding with AI agents',
+        icon: 'robot'
+    },
+    {
         id: 'testing',
         name: 'Testing Tools',
         sidebarName: 'Testing',
@@ -814,6 +821,78 @@ export const tools = [
         sidebarName: 'Chronometer',
         description: 'A stopwatch with lap times',
         icon: 'stopwatch'
+    },
+    {
+        category: 'ai',
+        slug: 'agents-md-generator',
+        title: 'AGENTS.md & Rules Generator',
+        sidebarName: 'AGENTS.md Generator',
+        description: 'Generate AGENTS.md, CLAUDE.md, Cursor and Copilot rules for your project',
+        icon: 'file-earmark-text'
+    },
+    {
+        category: 'ai',
+        slug: 'prompt-builder',
+        title: 'Prompt Builder',
+        sidebarName: 'Prompt Builder',
+        description: 'Structure clear prompts with role, context, task and constraints',
+        icon: 'pencil-square'
+    },
+    {
+        category: 'ai',
+        slug: 'prompt-library',
+        title: 'Prompt Library',
+        sidebarName: 'Prompt Library',
+        description: 'Ready-to-use prompts for planning, building, debugging and reviewing code',
+        icon: 'journal-text'
+    },
+    {
+        category: 'ai',
+        slug: 'token-counter',
+        title: 'LLM Token Counter',
+        sidebarName: 'Token Counter',
+        description: 'Estimate tokens and input cost of a prompt or file',
+        icon: 'coin'
+    },
+    {
+        category: 'ai',
+        slug: 'repo-packer',
+        title: 'Repo Packer',
+        sidebarName: 'Repo Packer',
+        description: 'Pack project files into one prompt-friendly document',
+        icon: 'box-seam'
+    },
+    {
+        category: 'ai',
+        slug: 'design-md-generator',
+        title: 'DESIGN.md Generator',
+        sidebarName: 'DESIGN.md Generator',
+        description: 'Describe your visual identity for coding agents',
+        icon: 'palette2'
+    },
+    {
+        category: 'ai',
+        slug: 'commit-message-builder',
+        title: 'Commit Message Builder',
+        sidebarName: 'Commit Message',
+        description: 'Write Conventional Commits messages',
+        icon: 'git'
+    },
+    {
+        category: 'ai',
+        slug: 'llms-txt-generator',
+        title: 'llms.txt Generator',
+        sidebarName: 'llms.txt Generator',
+        description: 'Create an llms.txt file so AI assistants understand your site',
+        icon: 'file-earmark-richtext'
+    },
+    {
+        category: 'ai',
+        slug: 'mcp-config-generator',
+        title: 'MCP Config Generator',
+        sidebarName: 'MCP Config',
+        description: 'Generate MCP server config for Claude, Cursor and VS Code',
+        icon: 'plug'
     },
     {
         category: 'testing',
