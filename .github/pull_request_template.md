@@ -15,6 +15,7 @@
 
 - [ ] `bun run test` passes
 - [ ] `bun run build` passes
+- [ ] `bun run test:e2e` passes (run `bun run build` first)
 - [ ] New logic lives in `src/lib` and has a Vitest test
 - [ ] For a new tool: it is registered in `src/lib/tools.js` and has a page in `src/routes/<category>/<slug>/`
 - [ ] For a new tool that suits agents: it is added to `src/lib/agentTools.js`

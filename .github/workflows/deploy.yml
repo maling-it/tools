@@ -42,6 +42,16 @@ jobs:
         run: |
           bun run build
           touch build/.nojekyll
+      # Open every page in a real browser before publishing; a broken page blocks the deploy.
+      - name: Browser tests
+        run: bun run test:e2e
+      - name: Upload failure details
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: test-results
+          retention-days: 7
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
