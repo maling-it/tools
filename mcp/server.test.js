@@ -1,10 +1,16 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { createServer } from './server.js';
 
-const connect = async () => {
-    const { server, toolCount, domAvailable } = await createServer();
+const closers = [];
+afterEach(() => {
+    while (closers.length) closers.pop()();
+});
+
+const connect = async (options) => {
+    const { server, toolCount, domAvailable, close } = await createServer(options);
+    closers.push(close);
     const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
     const client = new Client({ name: 'test', version: '1.0.0' });
     await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
@@ -62,5 +68,39 @@ describe('mools mcp server', () => {
         const catalog = await client.readResource({ uri: 'mools://catalog' });
         expect(JSON.parse(catalog.contents[0].text).tools.length).toBeGreaterThan(100);
         await expect(client.readResource({ uri: 'mools://nope' })).rejects.toThrow();
+    });
+
+    it('rejects invalid arguments with readable messages', async () => {
+        const { client } = await connect();
+        const wrongType = await client.callTool({ name: 'slugify', arguments: { text: 12345 } });
+        expect(wrongType.isError).toBe(true);
+        expect(wrongType.content[0].text).toBe('Argument "text" must be a string (got number).');
+        const badEnum = await client.callTool({ name: 'hash_text', arguments: { text: 'x', algorithm: 'crc32' } });
+        expect(badEnum.content[0].text).toContain('must be one of: md5, sha1, sha256, sha512');
+        const extra = await client.callTool({ name: 'hash_text', arguments: { text: 'x', algorithm: 'md5', bogus: true } });
+        expect(extra.content[0].text).toContain('Unknown argument "bogus"');
+        const range = await client.callTool({ name: 'generate_password', arguments: { length: 2 } });
+        expect(range.content[0].text).toContain('must be at least 4');
+    });
+
+    it('stops a runaway tool and keeps serving', async () => {
+        const { client } = await connect({ timeoutMs: 1500 });
+        // A regular expression with nested repeats takes exponential time on this input.
+        const started = Date.now();
+        const hostile = await client.callTool({ name: 'regex_test', arguments: { pattern: '(a+)+$', text: 'a'.repeat(40) + '!' } });
+        expect(hostile.isError).toBe(true);
+        expect(hostile.content[0].text).toContain('was stopped');
+        expect(Date.now() - started).toBeLessThan(6000);
+        // The worker was replaced, so the next calls work, including the DOM based ones.
+        const after = await client.callTool({ name: 'base64', arguments: { text: 'hi', mode: 'encode' } });
+        expect(after.content[0].text).toBe('aGk=');
+        const dom = await client.callTool({ name: 'html_to_text', arguments: { html: '<p>ok</p>' } });
+        expect(dom.content[0].text).toBe('ok');
+    }, 20_000);
+
+    it('answers calls made at the same time', async () => {
+        const { client } = await connect();
+        const results = await Promise.all(Array.from({ length: 30 }, (_, i) => client.callTool({ name: 'hash_text', arguments: { text: `job ${i}`, algorithm: 'sha256' } })));
+        expect(results.every((r) => !r.isError && r.content[0].text.length === 64)).toBe(true);
     });
 });

@@ -102,6 +102,7 @@ Mools is built to be used by AI agents as well as people:
 - **WebMCP**: in browsers that support `navigator.modelContext`, every tool in `src/lib/agentTools.js` is registered on each page, so in-browser agents can call them directly.
 - **MCP server**: `bun run mcp` starts a stdio MCP server (`mcp/server.js`). It provides:
   - **Tools**: every tool in `src/lib/agentTools.js`, annotated as read-only. Tools that parse HTML or XML use `jsdom` (an optional dependency); without it they are left out.
+  - **Safety**: every call is checked against the tool's input schema and runs in a worker thread with a 15 second limit, so a runaway call is stopped without freezing the server.
   - **Prompts**: the prompt library (`src/lib/prompts.js`, 24 prompts) as MCP prompts, with each `{{placeholder}}` as an argument.
   - **Resources**: `mools://catalog` (all web tools) and `mools://prompts` (the prompt library).
 

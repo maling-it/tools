@@ -13,7 +13,8 @@ import {
     ListToolsRequestSchema,
     ReadResourceRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
-import { agentTools, callAgentTool } from '../src/lib/agentTools.js';
+import { agentTools } from '../src/lib/agentTools.js';
+import { createRunner } from './runner.js';
 import { PROMPTS } from '../src/lib/prompts.js';
 import { categories, tools as pages } from '../src/lib/tools.js';
 import { extractVariables, fillTemplate } from '../src/lib/vibe.js';
@@ -21,11 +22,11 @@ import { SITE_URL } from '../src/lib/site.js';
 
 const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
-// A few tools parse HTML or XML and need DOMParser. Node has none, so borrow jsdom's when it is installed.
-const enableDomTools = async () => {
+// A few tools parse HTML or XML and need a DOM. The worker thread that runs the tools provides one through jsdom;
+// when jsdom is not installed those tools are simply not offered.
+const jsdomAvailable = async () => {
     try {
-        const { JSDOM } = await import('jsdom');
-        globalThis.DOMParser = new JSDOM('').window.DOMParser;
+        await import('jsdom');
         return true;
     } catch {
         return false;
@@ -51,8 +52,10 @@ const RESOURCES = [
     }
 ];
 
-export const createServer = async () => {
-    const domAvailable = await enableDomTools();
+export const createServer = async ({ timeoutMs = 15_000 } = {}) => {
+    const domAvailable = await jsdomAvailable();
+    const runner = createRunner({ timeoutMs });
+    runner.warmUp();
     const tools = agentTools.filter((tool) => domAvailable || !tool.dom);
 
     const server = new Server(
@@ -78,11 +81,10 @@ export const createServer = async () => {
         if (!tools.some((tool) => tool.name === name)) {
             return { isError: true, content: [{ type: 'text', text: `Unknown tool "${name}".` }] };
         }
-        try {
-            return { content: [{ type: 'text', text: await callAgentTool(name, args ?? {}) }] };
-        } catch (error) {
-            return { isError: true, content: [{ type: 'text', text: error.message }] };
-        }
+        const result = await runner.run(name, args ?? {});
+        return result.ok
+            ? { content: [{ type: 'text', text: result.text }] }
+            : { isError: true, content: [{ type: 'text', text: result.error }] };
     });
 
     server.setRequestHandler(ListPromptsRequestSchema, async () => ({
@@ -113,7 +115,7 @@ export const createServer = async () => {
         return { contents: [{ uri: resource.uri, mimeType: resource.mimeType, text: resource.read() }] };
     });
 
-    return { server, toolCount: tools.length, domAvailable };
+    return { server, toolCount: tools.length, domAvailable, close: () => runner.close() };
 };
 
 // Start on stdio only when run directly, so tests can import createServer.

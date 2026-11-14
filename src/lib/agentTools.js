@@ -410,9 +410,17 @@ export const agentTools = [
     },
     {
         name: 'cron_explain',
-        description: 'Explain a 5 field cron expression in English and list its next run times (server local time).',
+        description: 'Explain a 5 field cron expression in English and list its next run times. Times are evaluated in the time zone of the machine running the server, which is reported in the result.',
         inputSchema: object({ expression: string('Cron expression, e.g. "*/15 9-17 * * 1-5"'), runs: number('Number of upcoming runs, default 5') }, ['expression']),
-        run: ({ expression, runs = 5 }) => out({ description: explainCron(expression), nextRuns: nextCronRuns(expression, Math.min(runs, 20)).map((d) => d.toISOString()) })
+        run: ({ expression, runs = 5 }) =>
+            out({
+                description: explainCron(expression),
+                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                nextRuns: nextCronRuns(expression, Math.min(runs, 20)).map((d) => ({
+                    utc: d.toISOString(),
+                    local: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+                }))
+            })
     },
     {
         name: 'jwt_decode',
@@ -614,12 +622,60 @@ export const agentTools = [
 
 export const findAgentTool = (name) => agentTools.find((tool) => tool.name === name);
 
+const typeOf = (value) => (Array.isArray(value) ? 'array' : value === null ? 'null' : typeof value);
+
+const matchesType = (type, value) => {
+    switch (type) {
+        case 'string': return typeof value === 'string';
+        case 'number': return typeof value === 'number' && Number.isFinite(value);
+        case 'boolean': return typeof value === 'boolean';
+        case 'array': return Array.isArray(value);
+        case 'object': return typeOf(value) === 'object';
+        default: return true;
+    }
+};
+
+// Checks a value against the small subset of JSON Schema used by the tool definitions and returns readable problems.
+const validateValue = (schema, value, label) => {
+    if (!matchesType(schema.type, value)) return [`${label} must be ${schema.type === 'array' || schema.type === 'object' ? 'an' : 'a'} ${schema.type} (got ${typeOf(value)}).`];
+    if (schema.enum && !schema.enum.includes(value)) return [`${label} must be one of: ${schema.enum.join(', ')}.`];
+    if (typeof value === 'number') {
+        if (schema.minimum !== undefined && value < schema.minimum) return [`${label} must be at least ${schema.minimum}.`];
+        if (schema.maximum !== undefined && value > schema.maximum) return [`${label} must be at most ${schema.maximum}.`];
+    }
+    if (schema.type === 'array' && schema.items) return value.flatMap((item, i) => validateValue(schema.items, item, `${label}[${i}]`));
+    if (schema.type === 'object' && schema.properties) return validateObject(schema, value, label);
+    return [];
+};
+
+const validateObject = (schema, value, label) => {
+    const problems = [];
+    for (const key of schema.required ?? []) {
+        if (value[key] === undefined) problems.push(`Missing required argument "${key}"${label ? ` in ${label}` : ''}.`);
+    }
+    for (const [key, item] of Object.entries(value)) {
+        const property = schema.properties[key];
+        const path = label ? `${label}.${key}` : `Argument "${key}"`;
+        if (!property) {
+            if (schema.additionalProperties === false) problems.push(`Unknown argument "${key}"${label ? ` in ${label}` : ''}. Allowed: ${Object.keys(schema.properties).join(', ') || 'none'}.`);
+        } else if (item !== undefined) {
+            problems.push(...validateValue(property, item, path));
+        }
+    }
+    return problems;
+};
+
+/** Returns a list of human readable problems with `args`, empty when they match the tool's input schema. */
+export const validateArguments = (schema, args) => {
+    if (typeOf(args) !== 'object') return ['Arguments must be an object.'];
+    return validateObject(schema, args, '');
+};
+
 /** Runs a tool by name and always resolves to text, throwing on unknown tools or invalid input. */
 export const callAgentTool = async (name, args = {}) => {
     const tool = findAgentTool(name);
     if (!tool) throw new Error(`Unknown tool "${name}".`);
-    for (const key of tool.inputSchema.required ?? []) {
-        if (args[key] === undefined) throw new Error(`Missing required argument "${key}".`);
-    }
+    const problems = validateArguments(tool.inputSchema, args);
+    if (problems.length) throw new Error(problems.join(' '));
     return out(await tool.run(args));
 };
