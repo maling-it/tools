@@ -6,6 +6,7 @@ All notable changes to Mools are documented here. The format follows [Keep a Cha
 
 ### Added
 - MIT license, plus repository metadata (description, homepage, bugs and license) in `package.json`.
+- MCP server: tool calls run in a worker thread with a 15 second limit, so a runaway call (for example a regular expression with catastrophic backtracking) is stopped and the server keeps answering. Arguments are checked against each tool's schema, with readable messages for wrong types, unknown arguments, bad enum values and out-of-range numbers. `cron_explain` now reports the time zone and gives each run as UTC and local time.
 - Offline support: Mools can be installed as an app and works without a connection after the first visit (a web app manifest, icons and a service worker). A banner explains when you are offline, and another offers a reload when a new version is ready.
 - Favorites: a star button on every tool page. Favorites appear at the top of the sidebar, on the home page and first in the command palette, and are kept in the browser.
 - Browser tests (Playwright) that open every page and exercise the main tools. They run in a new `CI` workflow on pull requests and block the deploy when a page breaks.

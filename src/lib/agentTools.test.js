@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { agentTools, callAgentTool } from './agentTools.js';
+import { agentTools, callAgentTool, validateArguments } from './agentTools.js';
 
 describe('agent tools', () => {
     it('has unique snake_case names and valid schemas', () => {
@@ -60,11 +60,38 @@ describe('agent tools', () => {
         expect(plan.plan[0].to).toBe('a-b.txt');
         expect(plan.script).toContain("mv -n -- 'A B.TXT' 'a-b.txt'");
         expect(JSON.parse(await callAgentTool('split_csv', { csv: 'a\n1\n2', rowsPerFile: 1 })).files).toBe(2);
-        await expect(callAgentTool('bulk_transform', { text: 'x', operation: 'nope' })).rejects.toThrow('Unknown operation');
+        await expect(callAgentTool('bulk_transform', { text: 'x', operation: 'nope' })).rejects.toThrow('must be one of');
     });
 
     it('rejects unknown tools and missing arguments', async () => {
         await expect(callAgentTool('nope')).rejects.toThrow('Unknown tool');
         await expect(callAgentTool('base64', { text: 'x' })).rejects.toThrow('Missing required argument "mode"');
+    });
+
+    it('validates arguments against the input schema', async () => {
+        const base64 = agentTools.find((t) => t.name === 'base64').inputSchema;
+        expect(validateArguments(base64, { text: 'x', mode: 'encode' })).toEqual([]);
+        expect(validateArguments(base64, { text: 'x' })).toEqual(['Missing required argument "mode".']);
+        expect(validateArguments(base64, { text: 5, mode: 'encode' })).toEqual(['Argument "text" must be a string (got number).']);
+        expect(validateArguments(base64, { text: 'x', mode: 'nope' })[0]).toContain('must be one of: encode, decode');
+        expect(validateArguments(base64, { text: 'x', mode: 'encode', extra: 1 })[0]).toContain('Unknown argument "extra"');
+        expect(validateArguments(base64, 'text')).toEqual(['Arguments must be an object.']);
+        expect(validateArguments(base64, [])).toEqual(['Arguments must be an object.']);
+        expect(validateArguments(base64, { text: 'x', mode: 'encode', urlSafe: 'yes' })[0]).toContain('must be a boolean');
+
+        const average = agentTools.find((t) => t.name === 'average_cost').inputSchema;
+        expect(validateArguments(average, { purchases: [{ amount: 1, price: 2 }] })).toEqual([]);
+        expect(validateArguments(average, { purchases: [{ amount: 'x', price: 2 }] })[0]).toContain('purchases"[0].amount must be a number');
+        expect(validateArguments(average, { purchases: 'none' })[0]).toContain('must be an array');
+        await expect(callAgentTool('slugify', { text: 5 })).rejects.toThrow('must be a string');
+    });
+
+    it('reports the time zone with cron run times', async () => {
+        const result = JSON.parse(await callAgentTool('cron_explain', { expression: '30 8 * * *', runs: 2 }));
+        expect(result.description).toContain('08:30');
+        expect(typeof result.timeZone).toBe('string');
+        expect(result.nextRuns).toHaveLength(2);
+        expect(result.nextRuns[0].local).toMatch(/^\d{4}-\d{2}-\d{2} 08:30$/);
+        expect(result.nextRuns[0].utc).toMatch(/Z$/);
     });
 });
