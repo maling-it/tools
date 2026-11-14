@@ -115,9 +115,9 @@ Versions follow [Semantic Versioning](https://semver.org/) and every release is 
 
 1. Add a `## [x.y.z] - YYYY-MM-DD` section to `CHANGELOG.md` and set the same version in `package.json`.
 2. Commit with a message such as `Release vx.y.z: bump version and update changelog`.
-3. Tag and push: `git tag -a vx.y.z -m "Mools x.y.z: summary" && git push origin master --tags`.
+3. Create a signed tag and push it: `git tag -s vx.y.z -m "Mools x.y.z: summary" && git push origin master --tags`.
 
-The `Release` workflow then checks that the tag matches `package.json` and the changelog, runs the tests and the build, and publishes a GitHub release with the changelog section as its notes and the built site attached. Versions below 1.0.0 and tags with a suffix such as `-rc.1` are marked as pre-releases.
+The `Release` workflow then checks that the tag matches `package.json` and the changelog, runs the tests and the build, and publishes a GitHub release with the changelog section as its notes and the built site attached. Tags are signed (`git tag -s`, or set `git config tag.gpgsign true`) so GitHub shows them as verified. Versions below 1.0.0 and tags with a suffix such as `-rc.1` are marked as pre-releases.
 
 ## Contributing
 
