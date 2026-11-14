@@ -536,6 +536,310 @@ export const tools = [
         icon: 'columns-gap'
     },
     {
+        category: 'string',
+        slug: 'slugify',
+        title: 'Slugify String',
+        sidebarName: 'Slugify String',
+        description: 'Turn any text into a clean URL slug',
+        icon: 'link-45deg'
+    },
+    {
+        category: 'string',
+        slug: 'regex-tester',
+        title: 'Regex Tester',
+        sidebarName: 'Regex Tester',
+        description: 'Test regular expressions with live matches, groups and replacements',
+        icon: 'regex'
+    },
+    {
+        category: 'string',
+        slug: 'text-diff',
+        title: 'Text Diff',
+        sidebarName: 'Text Diff',
+        description: 'Compare two texts and see what changed',
+        icon: 'file-diff'
+    },
+    {
+        category: 'string',
+        slug: 'nato-alphabet',
+        title: 'Text to NATO Alphabet',
+        sidebarName: 'NATO Alphabet',
+        description: 'Spell text with the NATO phonetic alphabet',
+        icon: 'broadcast'
+    },
+    {
+        category: 'string',
+        slug: 'text-to-unicode',
+        title: 'Text to Unicode',
+        sidebarName: 'Text to Unicode',
+        description: 'Convert text to Unicode code points and back',
+        icon: 'emoji-smile'
+    },
+    {
+        category: 'string',
+        slug: 'line-tools',
+        title: 'Line Tools',
+        sidebarName: 'Line Tools',
+        description: 'Sort, reverse, de-duplicate and clean up lists of lines',
+        icon: 'sort-alpha-down'
+    },
+    {
+        category: 'converter',
+        slug: 'yaml-to-json',
+        title: 'YAML to JSON',
+        sidebarName: 'YAML to JSON',
+        description: 'Convert YAML into formatted JSON',
+        icon: 'filetype-yml'
+    },
+    {
+        category: 'converter',
+        slug: 'json-to-yaml',
+        title: 'JSON to YAML',
+        sidebarName: 'JSON to YAML',
+        description: 'Convert JSON into readable YAML',
+        icon: 'filetype-yml'
+    },
+    {
+        category: 'converter',
+        slug: 'toml-to-json',
+        title: 'TOML to JSON',
+        sidebarName: 'TOML to JSON',
+        description: 'Convert TOML into formatted JSON',
+        icon: 'file-earmark-code'
+    },
+    {
+        category: 'converter',
+        slug: 'json-to-toml',
+        title: 'JSON to TOML',
+        sidebarName: 'JSON to TOML',
+        description: 'Convert a JSON object into TOML',
+        icon: 'file-earmark-code'
+    },
+    {
+        category: 'converter',
+        slug: 'yaml-to-toml',
+        title: 'YAML to TOML',
+        sidebarName: 'YAML to TOML',
+        description: 'Convert YAML into TOML',
+        icon: 'file-earmark-code'
+    },
+    {
+        category: 'converter',
+        slug: 'toml-to-yaml',
+        title: 'TOML to YAML',
+        sidebarName: 'TOML to YAML',
+        description: 'Convert TOML into YAML',
+        icon: 'filetype-yml'
+    },
+    {
+        category: 'converter',
+        slug: 'json-to-xml',
+        title: 'JSON to XML',
+        sidebarName: 'JSON to XML',
+        description: 'Convert JSON into XML with attributes and arrays',
+        icon: 'filetype-xml'
+    },
+    {
+        category: 'converter',
+        slug: 'markdown-to-html',
+        title: 'Markdown to HTML',
+        sidebarName: 'Markdown to HTML',
+        description: 'Convert Markdown to HTML with a live preview',
+        icon: 'markdown'
+    },
+    {
+        category: 'converter',
+        slug: 'sql-formatter',
+        title: 'SQL Formatter',
+        sidebarName: 'SQL Formatter',
+        description: 'Prettify SQL for MySQL, PostgreSQL, SQLite and more',
+        icon: 'database'
+    },
+    {
+        category: 'converter',
+        slug: 'json-diff',
+        title: 'JSON Diff',
+        sidebarName: 'JSON Diff',
+        description: 'Compare two JSON documents ignoring key order',
+        icon: 'file-diff'
+    },
+    {
+        category: 'converter',
+        slug: 'color-converter',
+        title: 'Color Converter',
+        sidebarName: 'Color Converter',
+        description: 'Convert HEX, RGB, HSL and CMYK and check contrast',
+        icon: 'palette'
+    },
+    {
+        category: 'converter',
+        slug: 'base-converter',
+        title: 'Integer Base Converter',
+        sidebarName: 'Base Converter',
+        description: 'Convert numbers between binary, octal, decimal, hex and more',
+        icon: '123'
+    },
+    {
+        category: 'converter',
+        slug: 'roman-numeral-converter',
+        title: 'Roman Numeral Converter',
+        sidebarName: 'Roman Numerals',
+        description: 'Convert numbers to Roman numerals and back',
+        icon: 'type-bold'
+    },
+    {
+        category: 'converter',
+        slug: 'timestamp-converter',
+        title: 'Unix Timestamp Converter',
+        sidebarName: 'Unix Timestamp',
+        description: 'Convert Unix timestamps and dates to every format',
+        icon: 'calendar-event'
+    },
+    {
+        category: 'converter',
+        slug: 'unit-converter',
+        title: 'Unit Converter',
+        sidebarName: 'Unit Converter',
+        description: 'Convert length, mass, volume, speed, data and temperature',
+        icon: 'rulers'
+    },
+    {
+        category: 'security',
+        slug: 'jwt-decoder',
+        title: 'JWT Decoder',
+        sidebarName: 'JWT Decoder',
+        description: 'Decode JSON Web Tokens and inspect their claims',
+        icon: 'shield-check'
+    },
+    {
+        category: 'security',
+        slug: 'hmac-generator',
+        title: 'HMAC Generator',
+        sidebarName: 'HMAC Generator',
+        description: 'Compute HMAC signatures with SHA-1, SHA-256 and more',
+        icon: 'key'
+    },
+    {
+        category: 'security',
+        slug: 'basic-auth-generator',
+        title: 'Basic Auth Generator',
+        sidebarName: 'Basic Auth Generator',
+        description: 'Generate the HTTP Basic Authorization header',
+        icon: 'person-lock'
+    },
+    {
+        category: 'security',
+        slug: 'totp-generator',
+        title: 'TOTP Generator',
+        sidebarName: 'TOTP Generator',
+        description: 'Generate time-based one-time passwords for 2FA testing',
+        icon: 'stopwatch'
+    },
+    {
+        category: 'security',
+        slug: 'bcrypt',
+        title: 'Bcrypt Hash Generator',
+        sidebarName: 'Bcrypt',
+        description: 'Hash and compare passwords with bcrypt',
+        icon: 'lock'
+    },
+    {
+        category: 'security',
+        slug: 'password-strength',
+        title: 'Password Strength Analyser',
+        sidebarName: 'Password Strength',
+        description: 'Estimate how long a password would resist guessing',
+        icon: 'speedometer2'
+    },
+    {
+        category: 'generator',
+        slug: 'uuid-generator',
+        title: 'UUID & ULID Generator',
+        sidebarName: 'UUID & ULID Generator',
+        description: 'Generate UUID v4, UUID v7 and ULID identifiers',
+        icon: 'hash'
+    },
+    {
+        category: 'generator',
+        slug: 'cron-generator',
+        title: 'Crontab Generator',
+        sidebarName: 'Crontab Generator',
+        description: 'Explain cron expressions and preview the next runs',
+        icon: 'clock'
+    },
+    {
+        category: 'generator',
+        slug: 'svg-placeholder-generator',
+        title: 'SVG Placeholder Generator',
+        sidebarName: 'SVG Placeholder',
+        description: 'Create placeholder images as SVG',
+        icon: 'image'
+    },
+    {
+        category: 'generator',
+        slug: 'lorem-ipsum-generator',
+        title: 'Lorem Ipsum Generator',
+        sidebarName: 'Lorem Ipsum',
+        description: 'Generate placeholder text',
+        icon: 'text-paragraph'
+    },
+    {
+        category: 'calculator',
+        slug: 'chmod-calculator',
+        title: 'Chmod Calculator',
+        sidebarName: 'Chmod Calculator',
+        description: 'Calculate Unix file permissions in octal and symbolic form',
+        icon: 'terminal'
+    },
+    {
+        category: 'calculator',
+        slug: 'percentage-calculator',
+        title: 'Percentage Calculator',
+        sidebarName: 'Percentage Calculator',
+        description: 'Calculate percentages, ratios and percentage change',
+        icon: 'percent'
+    },
+    {
+        category: 'calculator',
+        slug: 'ipv4-subnet-calculator',
+        title: 'IPv4 Subnet Calculator',
+        sidebarName: 'IPv4 Subnet Calculator',
+        description: 'Calculate network, broadcast and host range from CIDR',
+        icon: 'diagram-3'
+    },
+    {
+        category: 'calculator',
+        slug: 'chronometer',
+        title: 'Chronometer',
+        sidebarName: 'Chronometer',
+        description: 'A stopwatch with lap times',
+        icon: 'stopwatch'
+    },
+    {
+        category: 'testing',
+        slug: 'http-status-codes',
+        title: 'HTTP Status Codes',
+        sidebarName: 'HTTP Status Codes',
+        description: 'Searchable reference of HTTP status codes',
+        icon: 'hdd-network'
+    },
+    {
+        category: 'testing',
+        slug: 'mime-types',
+        title: 'MIME Types',
+        sidebarName: 'MIME Types',
+        description: 'Look up MIME types for file extensions',
+        icon: 'file-earmark'
+    },
+    {
+        category: 'testing',
+        slug: 'url-parser',
+        title: 'URL Parser',
+        sidebarName: 'URL Parser',
+        description: 'Break a URL into parts and query parameters',
+        icon: 'globe'
+    },
+    {
         category: 'testing',
         slug: 'telegram',
         title: 'Telegram Bot Tester',

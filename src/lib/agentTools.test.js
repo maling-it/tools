@@ -27,6 +27,19 @@ describe('agent tools', () => {
         expect(await callAgentTool('qr_code_svg', { text: 'hi' })).toContain('<svg');
     });
 
+    it('runs developer tools', async () => {
+        expect(await callAgentTool('convert_base', { value: '255', from: 10, to: 16 })).toBe('ff');
+        expect(await callAgentTool('roman_numeral', { value: '2024' })).toBe('MMXXIV');
+        expect(JSON.parse(await callAgentTool('subnet_calculator', { cidr: '10.0.0.0/8' })).usableHosts).toBe(16777214);
+        expect(await callAgentTool('convert_data_format', { text: 'a: 1', from: 'yaml', to: 'json' })).toContain('"a": 1');
+        expect(await callAgentTool('chmod_calculator', { value: '755' })).toContain('rwxr-xr-x');
+        expect(await callAgentTool('chmod_calculator', { value: 'rw-r--r--' })).toContain('644');
+        expect(await callAgentTool('hmac_sign', { message: 'The quick brown fox jumps over the lazy dog', key: 'key' })).toBe('f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8');
+        expect(JSON.parse(await callAgentTool('http_status', { query: '418' }))[0].name).toBe("I'm a teapot");
+        expect(await callAgentTool('generate_uuid', { type: 'v4', count: 3 })).toHaveLength(36 * 3 + 2);
+        await expect(callAgentTool('convert_data_format', { text: 'a', from: 'xml', to: 'json' })).rejects.toThrow();
+    });
+
     it('rejects unknown tools and missing arguments', async () => {
         await expect(callAgentTool('nope')).rejects.toThrow('Unknown tool');
         await expect(callAgentTool('base64', { text: 'x' })).rejects.toThrow('Missing required argument "mode"');

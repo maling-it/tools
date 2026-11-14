@@ -4,6 +4,11 @@ import { base64Decode, base64Encode, binaryToText, csvToHtmlTable, csvToJson, fo
 import { averageCost, capRate, concrete, dirt, formatMinutes, workMinutes } from './calculators.js';
 import { buildAffiliateLink, buildHtmlLink, buildMetaTags, generatePassword, makeTitles, md5, memorablePassword, shaHash } from './generators.js';
 import { extractLinks, htmlTablesToJson, htmlToText, xmlToJson } from './htmlTools.js';
+import { applyLineTool, convertBase, convertUnit, describeColor, describeDate, fromRoman, lineTools, loremIpsum, octalToPermissions, parseDateInput, percentages, permissionsToOctal, permissionsToSymbolic, slugify, svgPlaceholder, textToNato, textToUnicode, toRoman, ulid, unicodeToText, uuidV4, uuidV7, UNITS } from './devUtils.js';
+import { basicAuthHeader, bcryptCompare, bcryptHash, decodeJwt, hmac, parseUrl, passwordStrength, subnet, totp } from './netSecurity.js';
+import { jsonToToml, jsonToXml, jsonToYaml, tomlToJson, tomlToYaml, yamlToJson, yamlToToml } from './formats.js';
+import { explainCron, formatSql, jsonDiff, markdownToHtml, nextCronRuns, textDiff } from './formatters.js';
+import { HTTP_STATUS, MIME_TYPES } from './reference.js';
 import { caseConverters, escapeHtml, escapeJs, escapeXml, replaceText, textStats, unescapeHtml, unescapeJs, unescapeXml, urlDecode, urlEncode } from './textUtils.js';
 
 const string = (description, extra = {}) => ({ type: 'string', description, ...extra });
@@ -254,6 +259,216 @@ export const agentTools = [
             const minutes = workMinutes(start, end, breakMinutes);
             return out({ minutes, formatted: formatMinutes(minutes), decimalHours: Number((minutes / 60).toFixed(2)) });
         }
+    },
+    {
+        name: 'convert_data_format',
+        description: 'Convert between JSON, YAML, TOML and XML (JSON to XML only). Dotted rules: TOML needs an object at the top level.',
+        inputSchema: object({ text: string('Input document'), from: string('Source format', { enum: ['json', 'yaml', 'toml'] }), to: string('Target format', { enum: ['json', 'yaml', 'toml', 'xml'] }) }),
+        run: ({ text, from, to }) => {
+            if (from === to) throw new Error('Source and target format are the same.');
+            const table = { 'yaml>json': yamlToJson, 'json>yaml': jsonToYaml, 'toml>json': tomlToJson, 'json>toml': jsonToToml, 'yaml>toml': yamlToToml, 'toml>yaml': tomlToYaml, 'json>xml': jsonToXml };
+            const convert = table[`${from}>${to}`];
+            if (!convert) throw new Error(`Converting ${from} to ${to} is not supported.`);
+            return convert(text);
+        }
+    },
+    {
+        name: 'markdown_to_html',
+        description: 'Convert GitHub flavored Markdown to HTML.',
+        inputSchema: object({ markdown: string('Markdown text') }),
+        run: ({ markdown }) => markdownToHtml(markdown)
+    },
+    {
+        name: 'format_sql',
+        description: 'Prettify a SQL query.',
+        inputSchema: object({ sql: string('SQL text'), dialect: string('SQL dialect', { enum: ['sql', 'mysql', 'postgresql', 'sqlite', 'mariadb', 'transactsql', 'bigquery', 'plsql'] }) }, ['sql']),
+        run: ({ sql, dialect = 'sql' }) => formatSql(sql, { language: dialect })
+    },
+    {
+        name: 'text_diff',
+        description: 'Compare two texts and return the changes as JSON parts with type added, removed or same.',
+        inputSchema: object({ original: string('Original text'), changed: string('Changed text'), mode: string('Compare by', { enum: ['lines', 'words'] }) }, ['original', 'changed']),
+        run: ({ original, changed, mode = 'lines' }) => out(textDiff(original, changed, { mode }))
+    },
+    {
+        name: 'json_diff',
+        description: 'Compare two JSON documents ignoring key order; returns diff parts as JSON.',
+        inputSchema: object({ original: string('First JSON'), changed: string('Second JSON') }),
+        run: ({ original, changed }) => out(jsonDiff(original, changed))
+    },
+    {
+        name: 'regex_test',
+        description: 'Run a JavaScript regular expression against text and list all matches with capture groups.',
+        inputSchema: object({ pattern: string('Regular expression source'), text: string('Text to search'), flags: string('Flags such as "i" or "m"; "g" is always applied') }, ['pattern', 'text']),
+        run: ({ pattern, text, flags = '' }) => {
+            const regex = new RegExp(pattern, flags.includes('g') ? flags : flags + 'g');
+            return out([...text.matchAll(regex)].slice(0, 500).map((m) => ({ match: m[0], index: m.index, groups: m.slice(1), named: m.groups ?? null })));
+        }
+    },
+    {
+        name: 'slugify',
+        description: 'Turn text into a URL slug.',
+        inputSchema: object({ text: string('Text to slugify'), separator: string('Separator, default "-"') }, ['text']),
+        run: ({ text, separator = '-' }) => slugify(text, { separator })
+    },
+    {
+        name: 'lorem_ipsum',
+        description: 'Generate lorem ipsum placeholder text.',
+        inputSchema: object({ unit: string('Unit', { enum: ['paragraphs', 'sentences', 'words'] }), count: number('Amount, default 3'), startWithLorem: bool('Start with "Lorem ipsum", default true') }, []),
+        run: (args) => loremIpsum(args)
+    },
+    {
+        name: 'generate_uuid',
+        description: 'Generate UUIDs (v4 or v7) or ULIDs.',
+        inputSchema: object({ type: string('Identifier type', { enum: ['v4', 'v7', 'ulid'] }), count: number('How many, 1 to 100, default 1') }, []),
+        run: ({ type = 'v4', count = 1 }) => {
+            const make = { v4: uuidV4, v7: uuidV7, ulid };
+            if (!make[type]) throw new Error(`Unknown type "${type}".`);
+            return Array.from({ length: Math.max(1, Math.min(count, 100)) }, () => make[type]()).join('\n');
+        }
+    },
+    {
+        name: 'nato_alphabet',
+        description: 'Spell text with the NATO phonetic alphabet.',
+        inputSchema: object({ text: string('Text to spell') }),
+        run: ({ text }) => textToNato(text)
+    },
+    {
+        name: 'unicode_code_points',
+        description: 'Convert text to Unicode code points (U+0048) or decode code points and escapes back to text.',
+        inputSchema: object({ text: string('Input'), mode: string('Direction', { enum: ['text_to_unicode', 'unicode_to_text'] }) }),
+        run: ({ text, mode: m }) => (m === 'unicode_to_text' ? unicodeToText(text) : textToUnicode(text))
+    },
+    {
+        name: 'line_tools',
+        description: 'Sort, reverse, de-duplicate, shuffle, trim, remove empty lines or number the lines of a text.',
+        inputSchema: object({ text: string('Lines of text'), operation: string('Operation', { enum: Object.keys(lineTools) }) }),
+        run: ({ text, operation }) => {
+            if (!lineTools[operation]) throw new Error(`Unknown operation "${operation}".`);
+            return applyLineTool(text, operation);
+        }
+    },
+    {
+        name: 'color_convert',
+        description: 'Convert a HEX, rgb() or hsl() color into HEX, RGB, HSL and CMYK.',
+        inputSchema: object({ color: string('Color such as #1e90ff or rgb(30, 144, 255)') }),
+        run: ({ color }) => out(describeColor(color))
+    },
+    {
+        name: 'convert_base',
+        description: 'Convert an integer between number bases 2 to 36 (arbitrarily large numbers supported).',
+        inputSchema: object({ value: string('Number to convert'), from: number('Input base, 2-36'), to: number('Output base, 2-36') }),
+        run: ({ value, from, to }) => convertBase(value, from, to)
+    },
+    {
+        name: 'roman_numeral',
+        description: 'Convert a number from 1 to 3999 to a Roman numeral, or a Roman numeral to a number.',
+        inputSchema: object({ value: string('Number or Roman numeral') }),
+        run: ({ value }) => (/^\d+$/.test(value.trim()) ? toRoman(value.trim()) : String(fromRoman(value)))
+    },
+    {
+        name: 'timestamp_convert',
+        description: 'Convert a Unix timestamp (seconds or milliseconds) or a date string into ISO 8601, UTC, local and relative formats.',
+        inputSchema: object({ value: string('Timestamp or date string') }),
+        run: ({ value }) => out(describeDate(parseDateInput(value)))
+    },
+    {
+        name: 'unit_convert',
+        description: 'Convert a value between units: length, mass, volume, speed, area, data, time and temperature.',
+        inputSchema: object({ category: string('Category', { enum: Object.keys(UNITS) }), value: number('Value to convert'), from: string('Source unit, e.g. km, lb, °C'), to: string('Target unit') }),
+        run: ({ category, value, from, to }) => String(convertUnit(category, value, from, to))
+    },
+    {
+        name: 'percentage',
+        description: 'Compute X% of Y, X as a percentage of Y, and the percentage change from X to Y.',
+        inputSchema: object({ x: number('First number'), y: number('Second number') }),
+        run: (args) => out(percentages(args))
+    },
+    {
+        name: 'chmod_calculator',
+        description: 'Convert octal Unix permissions (e.g. 755) into symbolic notation, or symbolic permissions into octal.',
+        inputSchema: object({ value: string('Octal such as 755 or symbolic such as rwxr-xr-x') }),
+        run: ({ value }) => {
+            const v = value.trim().replace(/^-/, '');
+            if (/^[rwx-]{9}$/.test(v)) {
+                const permissions = [0, 3, 6].map((i) => ({ r: v[i] === 'r', w: v[i + 1] === 'w', x: v[i + 2] === 'x' }));
+                return out({ octal: permissionsToOctal(permissions), symbolic: v });
+            }
+            const permissions = octalToPermissions(v);
+            return out({ octal: v, symbolic: permissionsToSymbolic(permissions) });
+        }
+    },
+    {
+        name: 'subnet_calculator',
+        description: 'Calculate IPv4 subnet details (network, broadcast, netmask, host range, host count) from CIDR notation.',
+        inputSchema: object({ cidr: string('IPv4 address with prefix, e.g. 192.168.1.0/24') }),
+        run: ({ cidr }) => out(subnet(cidr))
+    },
+    {
+        name: 'cron_explain',
+        description: 'Explain a 5 field cron expression in English and list its next run times (server local time).',
+        inputSchema: object({ expression: string('Cron expression, e.g. "*/15 9-17 * * 1-5"'), runs: number('Number of upcoming runs, default 5') }, ['expression']),
+        run: ({ expression, runs = 5 }) => out({ description: explainCron(expression), nextRuns: nextCronRuns(expression, Math.min(runs, 20)).map((d) => d.toISOString()) })
+    },
+    {
+        name: 'jwt_decode',
+        description: 'Decode a JSON Web Token (header, payload, expiry). The signature is NOT verified.',
+        inputSchema: object({ token: string('JWT') }),
+        run: ({ token }) => out(decodeJwt(token))
+    },
+    {
+        name: 'hmac_sign',
+        description: 'Compute an HMAC of a message with a secret key.',
+        inputSchema: object({ message: string('Message'), key: string('Secret key'), algorithm: string('Hash', { enum: ['SHA-1', 'SHA-256', 'SHA-384', 'SHA-512'] }), encoding: string('Output encoding', { enum: ['hex', 'base64'] }) }, ['message', 'key']),
+        run: ({ message, key, algorithm = 'SHA-256', encoding = 'hex' }) => hmac(message, key, algorithm, encoding)
+    },
+    {
+        name: 'basic_auth_header',
+        description: 'Build an HTTP Basic Authorization header.',
+        inputSchema: object({ username: string('Username'), password: string('Password') }),
+        run: ({ username, password }) => basicAuthHeader(username, password)
+    },
+    {
+        name: 'totp_code',
+        description: 'Compute the current time-based one-time password (RFC 6238) for a Base32 secret.',
+        inputSchema: object({ secret: string('Base32 secret'), digits: number('Digits, default 6'), period: number('Period in seconds, default 30'), algorithm: string('Algorithm', { enum: ['SHA-1', 'SHA-256', 'SHA-512'] }) }, ['secret']),
+        run: ({ secret, digits = 6, period = 30, algorithm = 'SHA-1' }) => totp({ secret, digits, period, algorithm })
+    },
+    {
+        name: 'password_strength',
+        description: 'Estimate the entropy and offline crack time of a password.',
+        inputSchema: object({ password: string('Password to analyse') }),
+        run: ({ password }) => out(passwordStrength(password))
+    },
+    {
+        name: 'bcrypt',
+        description: 'Hash a password with bcrypt, or verify a password against a bcrypt hash.',
+        inputSchema: object({ password: string('Password'), hash: string('Existing bcrypt hash to compare against; omit to create a new hash'), rounds: number('Cost factor 4-14, default 10') }, ['password']),
+        run: async ({ password, hash, rounds = 10 }) => (hash ? String(await bcryptCompare(password, hash)) : bcryptHash(password, rounds))
+    },
+    {
+        name: 'parse_url',
+        description: 'Split a URL into protocol, host, port, path, query parameters and hash.',
+        inputSchema: object({ url: string('Full URL including scheme') }),
+        run: ({ url }) => out(parseUrl(url))
+    },
+    {
+        name: 'svg_placeholder',
+        description: 'Create a placeholder image as SVG markup.',
+        inputSchema: object({ width: number('Width in px'), height: number('Height in px'), background: string('Background color'), color: string('Text color'), text: string('Label text') }, []),
+        run: (args) => svgPlaceholder(args)
+    },
+    {
+        name: 'http_status',
+        description: 'Look up HTTP status codes by code number or by words in the name or description.',
+        inputSchema: object({ query: string('Code such as 404 or text such as "redirect"') }),
+        run: ({ query }) => out(HTTP_STATUS.filter((s) => `${s.code} ${s.name} ${s.description}`.toLowerCase().includes(String(query).trim().toLowerCase())))
+    },
+    {
+        name: 'mime_type',
+        description: 'Look up MIME types by file extension or by type text.',
+        inputSchema: object({ query: string('Extension such as png or text such as "application/json"') }),
+        run: ({ query }) => out(MIME_TYPES.filter((m) => `${m.extension} ${m.type}`.includes(String(query).trim().toLowerCase().replace(/^\./, ''))))
     },
     {
         name: 'qr_code_svg',
