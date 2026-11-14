@@ -1,38 +1,19 @@
-# create-svelte
+# Mools
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+Maling-it Tools: a collection of client-side developer tools (string utilities, converters and API testing helpers) built with SvelteKit 3, Svelte 5, Bootstrap and Halfmoon. Everything runs in the browser and the site is deployed to GitHub Pages under `/tools`.
 
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
+## Development
 
 ```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
+bun install
+bun run dev      # dev server on http://localhost:6969/tools/
+bun run test     # unit tests for src/lib
+bun run build    # static build into build/
+bun run preview
 ```
 
-## Developing
+## Adding a tool
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+1. Add an entry to `src/lib/tools.js`; the sidebar, home page, category pages and search pick it up automatically.
+2. Create `src/routes/<category>/<slug>/+page.svelte`. Most tools only need `ToolPage` with a list of `{ label, transform }` actions.
+3. Put the logic in `src/lib` and cover it with a Vitest test.
