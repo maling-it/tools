@@ -4,15 +4,27 @@ All notable changes to Mools are documented here. The format follows [Keep a Cha
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-15
+
+Mools now works offline, remembers your favorite tools and has a hardened MCP server. The project also has browser tests, a public roadmap and a complete set of community files.
+
 ### Added
-- MIT license, plus repository metadata (description, homepage, bugs and license) in `package.json`.
-- Community health files: `CONTRIBUTING.md`, a code of conduct (Contributor Covenant 2.1), a security policy, an accessibility statement and a support guide, plus an accessibility issue form.
-- MCP server: tool calls run in a worker thread with a 15 second limit, so a runaway call (for example a regular expression with catastrophic backtracking) is stopped and the server keeps answering. Arguments are checked against each tool's schema, with readable messages for wrong types, unknown arguments, bad enum values and out-of-range numbers. `cron_explain` now reports the time zone and gives each run as UTC and local time.
-- Offline support: Mools can be installed as an app and works without a connection after the first visit (a web app manifest, icons and a service worker). A banner explains when you are offline, and another offers a reload when a new version is ready.
-- Favorites: a star button on every tool page. Favorites appear at the top of the sidebar, on the home page and first in the command palette, and are kept in the browser.
-- Browser tests (Playwright) that open every page and exercise the main tools. They run in a new `CI` workflow on pull requests and block the deploy when a page breaks.
-- A public roadmap: a project board, version milestones (1.2.0, 1.3.0, 2.0.0) and ten tracked issues. New issues from the issue forms are added to the board automatically.
-- A `Release` workflow that publishes a GitHub release when a version tag is pushed, and signed release tags.
+- **Offline support.** Mools can be installed as an app and every page works without a connection after the first visit (a web app manifest, icons and a service worker, about 8 MB). A banner explains when you are offline, and another offers a reload when a new version is ready. The Telegram tester says clearly that it needs the internet.
+- **Favorites.** A star button on every tool page. Favorites appear at the top of the sidebar, on the home page and first in the command palette, and are kept in the browser.
+- **Browser tests** (Playwright) that open every page and exercise the main tools, run by a new `CI` workflow on every pull request. The deploy workflow runs them too, so a broken page blocks it.
+- **Community files**: `CONTRIBUTING.md`, a code of conduct (Contributor Covenant 2.1), a security policy, an accessibility statement and a support guide, plus an accessibility issue form. The repository's community standards checklist is complete.
+- **A public roadmap**: a project board, version milestones and tracked issues. New issues from the issue forms are added to the board automatically.
+- **MIT license** and repository metadata (description, homepage, bugs and license) in `package.json`.
+- A `Release` workflow that publishes a GitHub release when a version tag is pushed. Release tags are signed.
+
+### Changed
+- **MCP server:** tool calls run in a worker thread with a 15 second limit, and arguments are checked against each tool's schema, with readable messages for wrong types, bad values and out-of-range numbers. Unknown arguments are now rejected, because the schemas already said they were not allowed.
+- **MCP clients, note:** `cron_explain` now reports the `timeZone` and returns every run as an object with `utc` and `local` times; `nextRuns` used to be a list of UTC strings.
+- The logo and screenshots are about 21% smaller; every pixel is unchanged.
+
+### Fixed
+- A regular expression with catastrophic backtracking, for example `(a+)+$`, froze the MCP server for good. Such calls are now stopped after 15 seconds and the server keeps answering. (The web tools that take a pattern can still freeze the tab; this is tracked in [#20](https://github.com/maling-it/tools/issues/20).)
+- Passing the wrong type to an MCP tool gave a raw JavaScript error such as `text.normalize is not a function`.
 
 ## [1.1.0] - 2026-11-15
 
@@ -95,6 +107,7 @@ First stable release: 106 tools, agent support and a documented project.
 - CSV to JSON and Van Ophuijsen spelling converters.
 - Error page and SEO metadata.
 
+[1.2.0]: https://github.com/maling-it/tools/releases/tag/v1.2.0
 [1.1.0]: https://github.com/maling-it/tools/releases/tag/v1.1.0
 [1.0.0]: https://github.com/maling-it/tools/releases/tag/v1.0.0
 [0.5.0]: https://github.com/maling-it/tools/releases/tag/v0.5.0
