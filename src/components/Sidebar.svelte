@@ -5,6 +5,7 @@
     import ThemeSwitcher from "./ThemeSwitcher.svelte";
     import { onMount, untrack } from "svelte";
     import { categories, tools, toolsIn } from "#lib/tools.js";
+    import { favorites } from "#lib/favorites.svelte.js";
     import { base } from "#lib/paths.js";
 
     const OPEN_KEY = "mools-sidebar-open";
@@ -59,6 +60,15 @@
 
     const groups = $derived(
         [
+            {
+                id: "favorites",
+                name: "Favorites",
+                icon: "star-fill",
+                links: favorites.list
+                    .map((path) => tools.find((t) => t.path === path))
+                    .filter((tool) => tool && (matches(tool.sidebarName) || matches(tool.title)))
+                    .map((tool) => ({ name: tool.sidebarName, path: tool.path }))
+            },
             {
                 id: "start",
                 name: "Getting started",
@@ -128,6 +138,13 @@
             {#each groups as group (group.id)}
                 <hr class="sidebar-divider" />
                 <li>
+                    {#if group.id === "favorites"}
+                        <span class="d-flex align-items-center" id="group-favorites-title">
+                            <i class="bi bi-star-fill text-warning me-1"></i>
+                            <span class="me-auto">Favorites</span>
+                            <span class="badge bg-body-secondary text-body-secondary fw-normal">{group.links.length}</span>
+                        </span>
+                    {:else}
                     <button
                         type="button"
                         class="sidebar-group btn btn-link text-reset text-decoration-none d-flex align-items-center w-100 p-0 text-start"
@@ -140,8 +157,9 @@
                         <span class="badge bg-body-secondary text-body-secondary fw-normal me-1">{group.links.length}</span>
                         <i class="bi bi-chevron-{isOpen(group.id) ? 'up' : 'down'} small"></i>
                     </button>
+                    {/if}
                 </li>
-                {#if isOpen(group.id)}
+                {#if group.id === "favorites" || isOpen(group.id)}
                     {#each group.links as link (link.path)}
                         <li class="nav-item" id={link === group.links[0] ? `group-${group.id}` : undefined}>
                             <a

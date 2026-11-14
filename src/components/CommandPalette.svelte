@@ -4,6 +4,7 @@
     import { tick } from "svelte";
     import { categories, tools } from "#lib/tools.js";
     import { getRecent, searchTools } from "#lib/search.js";
+    import { favorites } from "#lib/favorites.svelte.js";
 
     let open = $state(false);
     let query = $state("");
@@ -16,8 +17,10 @@
 
     const results = $derived.by(() => {
         if (query.trim() === "") {
-            const recentTools = recent.map((path) => tools.find((t) => t.path === path)).filter(Boolean);
-            return recentTools.length ? recentTools : tools.slice(0, 10);
+            // Favorites first, then recently used tools without repeating the favorites.
+            const paths = [...new Set([...favorites.list, ...recent])];
+            const known = paths.map((path) => tools.find((t) => t.path === path)).filter(Boolean);
+            return known.length ? known : tools.slice(0, 10);
         }
         return searchTools(tools, query, 12);
     });
@@ -100,15 +103,15 @@
             <kbd class="me-2">Esc</kbd>
         </div>
         <ul id="palette-results" class="list-unstyled m-0 p-2 palette-results" role="listbox" bind:this={list}>
-            {#if query.trim() === "" && recent.length}
-                <li class="small text-body-secondary px-2 pb-1">Recent</li>
+            {#if query.trim() === "" && (recent.length || favorites.list.length)}
+                <li class="small text-body-secondary px-2 pb-1">{favorites.list.length ? "Favorites and recent" : "Recent"}</li>
             {/if}
             {#each results as tool, index (tool.path)}
                 <li role="option" aria-selected={index === selected}>
                     <button class="palette-item d-flex align-items-center gap-3 w-100 text-start" class:active={index === selected} type="button" onmousemove={() => (selected = index)} onclick={() => choose(tool)}>
                         <i class="bi bi-{tool.icon} fs-5 flex-shrink-0"></i>
                         <span class="flex-grow-1 text-truncate">
-                            <span class="d-block fw-semibold">{tool.title}</span>
+                            <span class="d-block fw-semibold">{tool.title}{#if favorites.has(tool.path)} <i class="bi bi-star-fill small" aria-label="Favorite"></i>{/if}</span>
                             <span class="d-block small text-truncate palette-desc">{tool.description}</span>
                         </span>
                         <span class="badge bg-body-secondary text-body-secondary fw-normal d-none d-sm-inline">{categoryName(tool.category)}</span>
