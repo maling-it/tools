@@ -1,0 +1,75 @@
+# Creates a GitHub release when a version tag such as v1.2.0 is pushed.
+# Release notes come from the matching section of CHANGELOG.md.
+name: Release
+
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # all tags, to link the previous version in the notes
+
+      - name: Check the tag against package.json and the changelog
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+          if [ "$VERSION" != "$PACKAGE_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $PACKAGE_VERSION. Bump the version and move the tag."
+            exit 1
+          fi
+          # Print the changelog section of this version: from its heading up to the next heading or link list.
+          awk -v v="$VERSION" '
+            $0 ~ "^## \\[" v "\\]" { found = 1; next }
+            found && /^## \[/ { exit }
+            found && /^\[[0-9]/ { exit }
+            found { print }
+          ' CHANGELOG.md | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "::error::CHANGELOG.md has no section for version $VERSION."
+            exit 1
+          fi
+          PREVIOUS="$(git tag --list 'v[0-9]*' --sort=-v:refname | grep -vx "$GITHUB_REF_NAME" | head -n 1 || true)"
+          if [ -n "$PREVIOUS" ]; then
+            printf '\n**Full changelog**: https://github.com/%s/compare/%s...%s\n' "$GITHUB_REPOSITORY" "$PREVIOUS" "$GITHUB_REF_NAME" >> release-notes.md
+          fi
+          cat release-notes.md
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Test
+        run: bun run test
+      - name: Build
+        run: bun run build
+
+      - name: Package the static site
+        run: tar -czf "mools-site-$GITHUB_REF_NAME.tar.gz" -C build .
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          FLAGS=""
+          # Versions below 1.0.0 and tags with a suffix such as -rc.1 are pre-releases.
+          case "$GITHUB_REF_NAME" in
+            v0.*|*-*) FLAGS="--prerelease" ;;
+          esac
+          gh release create "$GITHUB_REF_NAME" "mools-site-$GITHUB_REF_NAME.tar.gz" \
+            --verify-tag \
+            --title "Mools ${GITHUB_REF_NAME#v}" \
+            --notes-file release-notes.md \
+            $FLAGS

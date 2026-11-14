@@ -109,6 +109,16 @@ Mools is built to be used by AI agents as well as people:
 
 To add a prompt, add it to `src/lib/prompts.js`; the website and the MCP server both pick it up.
 
+## Releasing
+
+Versions follow [Semantic Versioning](https://semver.org/) and every release is listed in [`CHANGELOG.md`](CHANGELOG.md).
+
+1. Add a `## [x.y.z] - YYYY-MM-DD` section to `CHANGELOG.md` and set the same version in `package.json`.
+2. Commit with a message such as `Release vx.y.z: bump version and update changelog`.
+3. Tag and push: `git tag -a vx.y.z -m "Mools x.y.z: summary" && git push origin master --tags`.
+
+The `Release` workflow then checks that the tag matches `package.json` and the changelog, runs the tests and the build, and publishes a GitHub release with the changelog section as its notes and the built site attached. Versions below 1.0.0 and tags with a suffix such as `-rc.1` are marked as pre-releases.
+
 ## Contributing
 
 Bug reports, tool requests and pull requests are welcome.
