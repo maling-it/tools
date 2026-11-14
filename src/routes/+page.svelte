@@ -2,10 +2,23 @@
     import { resolve } from "$app/paths";
     import ToolCard from "../components/ToolCard.svelte";
     import { base } from "#lib/paths.js";
+    import { onMount } from "svelte";
     import { categories, tools, toolsIn } from "#lib/tools.js";
+    import { getRecent, searchTools } from "#lib/search.js";
 
     const featuredSlugs = ["change-case", "html-escape", "word-counter", "json-formatter", "csv-to-json", "telegram"];
     const featured = featuredSlugs.map((slug) => tools.find((tool) => tool.slug === slug));
+
+    let query = $state("");
+    let recent = $state([]);
+
+    onMount(() => {
+        recent = getRecent()
+            .map((path) => tools.find((tool) => tool.path === path))
+            .filter(Boolean);
+    });
+
+    const results = $derived(query.trim() ? searchTools(tools, query, 60) : []);
 </script>
 
 <svelte:head>
@@ -24,6 +37,42 @@
     <p class="lead text-body-secondary mb-2">A collection of useful online tools for developers and power users</p>
     <p class="text-body-secondary">No registration required • Fast and private • Runs in your browser</p>
 </div>
+
+<div class="mx-auto mb-5" style="max-width: 36rem;">
+    <label for="home-search" class="visually-hidden">Find a tool</label>
+    <div class="input-group input-group-lg">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input id="home-search" class="form-control" type="search" placeholder="Find a tool, e.g. json, password, regex" autocomplete="off" bind:value={query} />
+    </div>
+    <div class="form-text text-center">Tip: press <kbd>Ctrl</kbd> <kbd>K</kbd> anywhere to search.</div>
+</div>
+
+{#if query.trim()}
+    <section class="mb-5" aria-live="polite">
+        <h2 class="h4 mb-3">{results.length} {results.length === 1 ? "tool" : "tools"} found</h2>
+        <div class="row g-3">
+            {#each results as tool (tool.path)}
+                <div class="col-md-6 col-lg-4">
+                    <ToolCard {tool} showCategory />
+                </div>
+            {:else}
+                <p class="text-body-secondary">Nothing matches "{query}". Try a shorter word.</p>
+            {/each}
+        </div>
+    </section>
+{:else}
+{#if recent.length}
+    <section class="mb-5">
+        <h2 class="h4 mb-3"><i class="bi bi-clock-history me-2"></i>Recently used</h2>
+        <div class="row g-3">
+            {#each recent.slice(0, 3) as tool (tool.path)}
+                <div class="col-md-6 col-lg-4">
+                    <ToolCard {tool} showCategory />
+                </div>
+            {/each}
+        </div>
+    </section>
+{/if}
 
 <section class="mb-5">
     <h2 class="h4 mb-3"><i class="bi bi-star me-2"></i>Featured Tools</h2>
@@ -57,6 +106,8 @@
         {/each}
     </div>
 </section>
+
+{/if}
 
 <section class="mb-5">
     <div class="card">

@@ -4,16 +4,51 @@
     import { page } from "$app/state";
     import { base } from '#lib/paths.js';
     import { onMount } from "svelte";
+    import { categories, tools } from "#lib/tools.js";
 
-    let repoData;
+    let { onsearch } = $props();
+
+    let repoData = $state();
+
+    const crumbs = $derived.by(() => {
+        const path = page.url.pathname.slice(base.length).replace(/^\/|\/$/g, "");
+        if (!path) return [];
+        const [first, second] = path.split("/");
+        const category = categories.find((c) => c.id === first);
+        const tool = tools.find((t) => t.category === first && t.slug === second);
+        const items = [{ name: "Home", href: `${base}/` }];
+        if (category) {
+            items.push({ name: category.name, href: second ? `${base}/${category.id}/` : null });
+            if (tool) items.push({ name: tool.title, href: null });
+        } else {
+            items.push({ name: first[0].toUpperCase() + first.slice(1), href: null });
+        }
+        return items;
+    });
+
+    // The GitHub API allows few anonymous requests per hour, so the repository info is cached for 30 minutes.
+    const CACHE_KEY = "mools-repo";
 
     onMount(async () => {
         try {
-            const response = await fetch(
-                "https://api.github.com/repos/maling-it/tools",
-            );
+            const cached = JSON.parse(localStorage.getItem(CACHE_KEY) ?? "null");
+            if (cached && Date.now() - cached.time < 30 * 60 * 1000) {
+                repoData = cached.data;
+                return;
+            }
+        } catch {
+            // Ignore unreadable cache and fetch fresh data.
+        }
+        try {
+            const response = await fetch("https://api.github.com/repos/maling-it/tools");
             if (!response.ok) return;
-            repoData = await response.json();
+            const data = await response.json();
+            repoData = data;
+            try {
+                localStorage.setItem(CACHE_KEY, JSON.stringify({ time: Date.now(), data: { html_url: data.html_url, stargazers_count: data.stargazers_count } }));
+            } catch {
+                // Storage can be unavailable; the next page load simply fetches again.
+            }
         } catch (error) {
             console.error("Error fetching data:", error);
         }
@@ -48,13 +83,19 @@
             />
             Mools
         </a>
-        <div
-            class="d-none d-lg-block text-truncate"
-            style="color: hsla(var(--bs-emphasis-color-hsl), 0.7); letter-spacing: 1px;"
-        >
-            {page.url.pathname}
-        </div>
+        <nav class="d-none d-lg-block text-truncate" aria-label="Breadcrumb">
+            <ol class="breadcrumb mb-0 flex-nowrap">
+                {#each crumbs as crumb, index (index)}
+                    <li class="breadcrumb-item text-nowrap" class:active={!crumb.href} aria-current={!crumb.href ? "page" : undefined}>
+                        {#if crumb.href}<a class="text-decoration-none" href={crumb.href}>{crumb.name}</a>{:else}{crumb.name}{/if}
+                    </li>
+                {/each}
+            </ol>
+        </nav>
         <div class="btn-group ms-auto d-md-none">
+            <button type="button" class="btn btn-secondary btn-square" aria-label="Search tools" onclick={() => onsearch?.()}>
+                <i class="bi bi-search" aria-hidden="true"></i>
+            </button>
             <div class="btn-group">
                 <CoreSwitcher />
             </div>
@@ -75,6 +116,11 @@
             <div
                 class="d-flex align-items-center justify-content-center"
             >
+                <button type="button" class="btn btn-secondary me-2 d-none d-md-flex align-items-center" aria-label="Search tools" onclick={() => onsearch?.()}>
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    <span class="ms-2 d-none d-xl-inline">Search</span>
+                    <kbd class="ms-2 d-none d-xl-inline">Ctrl K</kbd>
+                </button>
                 <div class="dropdown me-2 d-none d-md-inline-block">
                     <CoreSwitcher />
                 </div>

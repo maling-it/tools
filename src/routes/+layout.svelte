@@ -10,6 +10,11 @@
     import { SITE_DESCRIPTION, SITE_URL } from "#lib/site.js";
     import Navbar from "../components/Navbar.svelte";
     import Sidebar from "../components/Sidebar.svelte";
+    import Footer from "../components/Footer.svelte";
+    import CommandPalette from "../components/CommandPalette.svelte";
+    import ToolCard from "../components/ToolCard.svelte";
+    import { addRecent, relatedTools } from "#lib/search.js";
+    import { categories } from "#lib/tools.js";
 
     let { children } = $props();
 
@@ -47,6 +52,16 @@
 
     const tool = $derived(tools.find((t) => page.url.pathname === `${base}${t.path}/`));
 
+    let palette = $state();
+
+    // Remember visited tools for the "Recent" lists.
+    $effect(() => {
+        if (tool) addRecent(tool.path);
+    });
+
+    const related = $derived(tool ? relatedTools(tools, tool, 3) : []);
+    const categoryName = $derived(tool ? categories.find((c) => c.id === tool.category)?.name : "");
+
     const structuredData = $derived(
         tool
             ? {
@@ -79,7 +94,23 @@
 </svelte:head>
 
 <Sidebar />
-<Navbar />
-<div class="container-md px-3 py-4 px-sm-4 px-xl-5">
+<Navbar onsearch={() => palette?.show()} />
+<CommandPalette bind:this={palette} />
+<div class="container-md px-3 py-4 px-sm-4 px-xl-5" id="top">
     {@render children()}
+
+    {#if related.length}
+        <section class="mt-5" aria-labelledby="related-heading">
+            <h2 id="related-heading" class="h5 mb-3">More in {categoryName}</h2>
+            <div class="row g-3">
+                {#each related as item (item.path)}
+                    <div class="col-md-6 col-lg-4">
+                        <ToolCard tool={item} />
+                    </div>
+                {/each}
+            </div>
+        </section>
+    {/if}
+
+    <Footer />
 </div>
