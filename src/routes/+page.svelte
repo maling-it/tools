@@ -5,6 +5,7 @@
     import { onMount } from "svelte";
     import { categories, tools, toolsIn } from "#lib/tools.js";
     import { getRecent, searchTools } from "#lib/search.js";
+    import { favorites } from "#lib/favorites.svelte.js";
 
     const featuredSlugs = ["change-case", "html-escape", "word-counter", "json-formatter", "csv-to-json", "telegram"];
     const featured = featuredSlugs.map((slug) => tools.find((tool) => tool.slug === slug));
@@ -19,6 +20,7 @@
     });
 
     const results = $derived(query.trim() ? searchTools(tools, query, 60) : []);
+    const favoriteTools = $derived(favorites.list.map((path) => tools.find((tool) => tool.path === path)).filter(Boolean));
 </script>
 
 <svelte:head>
@@ -61,6 +63,22 @@
         </div>
     </section>
 {:else}
+{#if favoriteTools.length}
+    <section class="mb-5" aria-labelledby="favorites-heading">
+        <h2 id="favorites-heading" class="h4 mb-3"><i class="bi bi-star-fill text-warning me-2"></i>Favorites</h2>
+        <div class="row g-3">
+            {#each favoriteTools.slice(0, 6) as tool (tool.path)}
+                <div class="col-md-6 col-lg-4">
+                    <ToolCard {tool} showCategory />
+                </div>
+            {/each}
+        </div>
+        {#if favoriteTools.length > 6}
+            <p class="small text-body-secondary mt-2 mb-0">{favoriteTools.length - 6} more in the sidebar.</p>
+        {/if}
+    </section>
+{/if}
+
 {#if recent.length}
     <section class="mb-5">
         <h2 class="h4 mb-3"><i class="bi bi-clock-history me-2"></i>Recently used</h2>

@@ -13,6 +13,9 @@
     import Footer from "../components/Footer.svelte";
     import CommandPalette from "../components/CommandPalette.svelte";
     import ToolCard from "../components/ToolCard.svelte";
+    import FavoriteButton from "../components/FavoriteButton.svelte";
+    import { favorites } from "#lib/favorites.svelte.js";
+    import { FAVORITES_KEY } from "#lib/favorites.js";
     import { addRecent, relatedTools } from "#lib/search.js";
     import { categories } from "#lib/tools.js";
 
@@ -22,6 +25,17 @@
     onMount(() => {
         import("bootstrap/dist/js/bootstrap.bundle.min.js");
         registerWebMcpTools();
+
+        // Lets automated tests wait until the page is interactive.
+        document.documentElement.dataset.hydrated = "true";
+
+        // Favorites live in localStorage; keep other tabs in sync.
+        favorites.load();
+        const onStorage = (event) => {
+            if (event.key === FAVORITES_KEY) favorites.load();
+        };
+        window.addEventListener("storage", onStorage);
+        return () => window.removeEventListener("storage", onStorage);
     });
 
     // WebMCP: let in-browser agents call the tools directly (navigator.modelContext).
@@ -97,6 +111,11 @@
 <Navbar onsearch={() => palette?.show()} />
 <CommandPalette bind:this={palette} />
 <div class="container-md px-3 py-4 px-sm-4 px-xl-5" id="top">
+    {#if tool}
+        <div class="float-end ms-2 mt-1">
+            <FavoriteButton path={tool.path} />
+        </div>
+    {/if}
     {@render children()}
 
     {#if related.length}
