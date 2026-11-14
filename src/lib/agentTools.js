@@ -1,5 +1,6 @@
 // Machine-callable versions of the tools, shared by the WebMCP registration in the browser
 // and the stdio MCP server in /mcp. Every tool has a JSON Schema and returns text.
+// Tools marked `dom` need DOMParser: native in browsers, provided by jsdom in the MCP server.
 import { base64Decode, base64Encode, binaryToText, csvToHtmlTable, csvToJson, formatJson, jsonToCsv, jsonToProperties, minifyJson, propertiesToJson, removeStopwords, textToBinary, textToHtmlList, toVanOphuijsen, uniqueWords } from './converters.js';
 import { averageCost, capRate, concrete, dirt, formatMinutes, workMinutes } from './calculators.js';
 import { buildAffiliateLink, buildHtmlLink, buildMetaTags, generatePassword, makeTitles, md5, memorablePassword, shaHash } from './generators.js';
@@ -26,7 +27,7 @@ const pair = (escape, unescape) => (args) => (args.mode === 'unescape' ? unescap
 /**
  * @typedef {{ name: string, description: string, inputSchema: object, dom?: boolean,
  *   run: (args: any) => string | Promise<string> }} AgentTool
- * `dom` marks tools that need DOMParser, so they are only available in the browser.
+ * `dom` marks tools that need DOMParser (the MCP server provides it through jsdom).
  */
 
 /** @type {AgentTool[]} */
@@ -147,28 +148,28 @@ export const agentTools = [
     },
     {
         name: 'html_to_text',
-        description: 'Strip HTML tags, scripts and styles and return plain text. Browser only.',
+        description: 'Strip HTML tags, scripts and styles and return plain text.',
         dom: true,
         inputSchema: object({ html: string('HTML to convert') }),
         run: ({ html }) => htmlToText(html)
     },
     {
         name: 'extract_html_links',
-        description: 'Extract all links (text and href) from HTML. Browser only.',
+        description: 'Extract all links (text and href) from HTML.',
         dom: true,
         inputSchema: object({ html: string('HTML to read') }),
         run: ({ html }) => out(extractLinks(html))
     },
     {
         name: 'html_table_to_json',
-        description: 'Extract the tables of an HTML document as JSON. Browser only.',
+        description: 'Extract the tables of an HTML document as JSON.',
         dom: true,
         inputSchema: object({ html: string('HTML containing a table') }),
         run: ({ html }) => out(htmlTablesToJson(html))
     },
     {
         name: 'xml_to_json',
-        description: 'Convert XML to JSON (attributes are prefixed with @). Browser only.',
+        description: 'Convert XML to JSON (attributes are prefixed with @).',
         dom: true,
         inputSchema: object({ xml: string('XML to convert') }),
         run: ({ xml }) => xmlToJson(xml)

@@ -24,7 +24,12 @@ Mools is built to be used by AI agents as well as people:
 
 - **`/llms.txt`**, **`/tools.json`** and **`/sitemap.xml`** are generated from `src/lib/tools.js` at build time. `tools.json` also lists the JSON Schema of every callable tool.
 - **WebMCP**: in browsers that support `navigator.modelContext`, every tool in `src/lib/agentTools.js` is registered on each page, so in-browser agents can call them directly.
-- **MCP server**: `bun run mcp` starts a stdio MCP server (`mcp/server.js`) with the same tools, except the few that need a browser DOM. Example client config:
+- **MCP server**: `bun run mcp` starts a stdio MCP server (`mcp/server.js`). It provides:
+  - **Tools**: every tool in `src/lib/agentTools.js`, annotated as read-only. Tools that parse HTML or XML use `jsdom` (an optional dependency); without it they are left out.
+  - **Prompts**: the prompt library (`src/lib/prompts.js`) as MCP prompts, with each `{{placeholder}}` as an argument.
+  - **Resources**: `mools://catalog` (all web tools) and `mools://prompts` (the prompt library).
+
+  Example client config (or generate one with the MCP Config Generator tool):
 
   ```json
   { "mcpServers": { "mools": { "command": "node", "args": ["/path/to/tools/mcp/server.js"] } } }
@@ -32,4 +37,4 @@ Mools is built to be used by AI agents as well as people:
 
 - Pages use labeled form fields and `SoftwareApplication` JSON-LD, so browser agents can also drive the UI.
 
-To expose a new tool to agents, add an entry to `src/lib/agentTools.js` (name, description, JSON Schema, `run`).
+To expose a new tool to agents, add an entry to `src/lib/agentTools.js` (name, description, JSON Schema, `run`). To add a prompt, add it to `src/lib/prompts.js`; the website and the MCP server both pick it up.

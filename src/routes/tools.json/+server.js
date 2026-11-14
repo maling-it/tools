@@ -14,11 +14,12 @@ export function GET() {
         categories: categories.map(({ id, name, description }) => ({ id, name, description, url: `${SITE_URL}/${id}/` })),
         pages: tools.map(({ category, slug, title, description }) => ({ slug, category, title, description, url: `${SITE_URL}/${category}/${slug}/` })),
         // JSON Schema definitions, usable with MCP, WebMCP or any function-calling API.
-        tools: agentTools.map(({ name, description, inputSchema, dom }) => ({
-            name,
-            description,
-            inputSchema,
-            availability: dom ? 'browser' : 'browser and mcp-server'
-        }))
+        tools: agentTools.map(({ name, description, inputSchema }) => ({ name, description, inputSchema })),
+        mcp: {
+            transport: 'stdio',
+            command: 'node mcp/server.js',
+            capabilities: ['tools', 'prompts', 'resources'],
+            resources: ['mools://catalog', 'mools://prompts']
+        }
     });
 }
