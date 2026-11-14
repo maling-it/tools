@@ -43,5 +43,5 @@
             </ul>
         </div>
     </div>
-    <p class="text-body-secondary mt-4 mb-0">&copy; {year} maling-it. Built with SvelteKit and Halfmoon.</p>
+    <p class="text-body-secondary mt-4 mb-0">&copy; {year} maling-it. Released under the <a class="link-secondary" href="{REPO_URL}/blob/master/LICENSE" rel="noreferrer">MIT license</a>. Built with SvelteKit and Halfmoon.</p>
 </footer>

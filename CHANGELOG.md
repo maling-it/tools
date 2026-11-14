@@ -2,6 +2,12 @@
 
 All notable changes to Mools are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- MIT license, plus repository metadata (description, homepage, bugs and license) in `package.json`.
+- A `Release` workflow that publishes a GitHub release when a version tag is pushed, and signed release tags.
+
 ## [1.1.0] - 2026-11-15
 
 ### Added

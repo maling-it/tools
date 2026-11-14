@@ -1,6 +1,16 @@
 {
   "name": "mools",
   "version": "1.1.0",
+  "description": "Free developer tools that run in your browser, with an MCP server for AI agents",
+  "license": "MIT",
+  "homepage": "https://maling-it.github.io/tools/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maling-it/tools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/maling-it/tools/issues"
+  },
   "private": true,
   "scripts": {
     "dev": "vite dev",

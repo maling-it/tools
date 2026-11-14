@@ -17,6 +17,8 @@
 
 <p align="center">
   <a href="https://github.com/maling-it/tools/actions/workflows/deploy.yml"><img alt="Deploy" src="https://github.com/maling-it/tools/actions/workflows/deploy.yml/badge.svg" /></a>
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
+  <a href="https://github.com/maling-it/tools/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/maling-it/tools" /></a>
 </p>
 
 <p align="center">
@@ -126,6 +128,10 @@ Bug reports, tool requests and pull requests are welcome.
 - Open an [issue](https://github.com/maling-it/tools/issues/new/choose) using one of the templates. For security problems, use a [private security advisory](https://github.com/maling-it/tools/security/advisories/new).
 - Before opening a pull request, run `bun run test` and `bun run build`.
 - Sign off your commits (`git commit -s`) and write the subject in the imperative mood, for example `Add CSS minifier tool`.
+
+## License
+
+Mools is released under the [MIT License](LICENSE).
 
 ## Built with
 
