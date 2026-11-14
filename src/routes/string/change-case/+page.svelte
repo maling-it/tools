@@ -1,28 +1,30 @@
 <script>
-    let text = '';
+    import ToolPage from "../../../components/ToolPage.svelte";
+    import { caseConverters } from "#lib/textUtils.js";
 
-    function handleUppercase() {
-        text = text.toUpperCase();
-    }
+    let text = $state("");
 
-    function handleLowercase() {
-        text = text.toLowerCase();
-    }
+    const labels = {
+        upper: "UPPERCASE",
+        lower: "lowercase",
+        title: "Title Case",
+        sentence: "Sentence case",
+        camel: "camelCase",
+        pascal: "PascalCase",
+        snake: "snake_case",
+        kebab: "kebab-case",
+        constant: "CONSTANT_CASE"
+    };
 
-    function handleTitleCase() {
-        text = text.toLowerCase().replace(/(^|\s)\S/g, function(initial) { return initial.toUpperCase(); });
-    }
+    const actions = Object.entries(caseConverters).map(([key, transform]) => ({
+        label: labels[key],
+        transform
+    }));
 </script>
 
-<svelte:head>
-    <title>Change Case Tool</title>
-</svelte:head>
-
-<h1>Change Case Tool</h1>
-<div>
-    <label for="example-textarea-1" class="form-label">Description</label>
-    <textarea bind:value={text} class="form-control" id="example-textarea-1" rows="6" placeholder="Enter your text here"></textarea>
-    <button class="btn btn-primary" type="button" on:click={handleUppercase}>Uppercase</button>
-    <button class="btn btn-primary" type="button" on:click={handleLowercase}>Lowercase</button>
-    <button class="btn btn-primary" type="button" on:click={handleTitleCase}>Title Case</button>
-</div>
+<ToolPage
+    title="Change Case Tool"
+    description="Convert your text between different letter cases and naming styles."
+    bind:value={text}
+    {actions}
+/>

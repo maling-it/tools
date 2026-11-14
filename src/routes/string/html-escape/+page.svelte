@@ -1,26 +1,20 @@
 <script>
     import ToolPage from "../../../components/ToolPage.svelte";
-    import { escapeHtml, unescapeHtml } from "../../../lib/textUtils.js";
+    import { escapeHtml, unescapeHtml } from "#lib/textUtils.js";
 
-    let text = "";
+    let text = $state("");
 
-    const buttons = [
-        {
-            label: "Escape",
-            onClick: () => { text = escapeHtml(text); }
-        },
-        {
-            label: "Unescape", 
-            onClick: () => { text = unescapeHtml(text); }
-        }
+    const actions = [
+        { label: "Escape", transform: escapeHtml },
+        { label: "Unescape", transform: unescapeHtml }
     ];
 </script>
 
 <ToolPage
     title="HTML Escape/Unescape Tool"
     description="Escape or unescape HTML entities in your text."
-    bind:textValue={text}
-    textPlaceholder="Enter your HTML here"
-    textLabel="HTML Content"
-    {buttons}
+    bind:value={text}
+    label="HTML Content"
+    placeholder="Enter your HTML here"
+    {actions}
 />

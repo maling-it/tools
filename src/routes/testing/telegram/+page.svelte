@@ -1,134 +1,145 @@
 <script>
-    let botToken = "";
-    let messageText = "";
-    let chatId = "";
-    let selectedOption = "sendMessage";
-    let responseMessage = "";
-    let photoFile = null;
-    let documentFile = null;
+    import OutputCard from "../../../components/OutputCard.svelte";
 
-    const sendMessage = async () => {
-        try {
-            let formData = new FormData();
-
-            if (selectedOption === "sendMessage") {
-                formData.append("chat_id", chatId);
-                formData.append("text", messageText);
-            } else if (selectedOption === "sendPhoto") {
-                formData.append("chat_id", chatId);
-                formData.append("photo", photoFile);
-                formData.append("caption", messageText);
-            } else if (selectedOption === "sendDocument") {
-                formData.append("chat_id", chatId);
-                formData.append("document", documentFile);
-                formData.append("caption", messageText);
-            }
-
-            const response = await fetch(
-                `https://api.telegram.org/bot${botToken}/${selectedOption}`,
-                {
-                    method: "POST",
-                    body: formData,
-                },
-            );
-
-            const data = await response.json();
-            responseMessage = JSON.stringify(data, null, 2);
-        } catch (error) {
-            responseMessage = `Error: ${error.message}`;
-        }
+    const methods = {
+        sendMessage: { label: "Send Message", field: null },
+        sendPhoto: { label: "Send Photo", field: "photo", accept: "image/*" },
+        sendDocument: { label: "Send Document", field: "document", accept: "*" }
     };
 
-    const getCurlCommand = () => {
-        let curlCommand = "";
+    let botToken = $state("");
+    let chatId = $state("");
+    let text = $state("");
+    let method = $state("sendMessage");
+    let parseMode = $state("");
+    let file = $state(null);
+    let response = $state("");
+    let error = $state("");
+    let sending = $state(false);
 
-        if (selectedOption === "sendMessage") {
-            curlCommand = `curl -X POST -H "Content-Type: application/json" -d '{"chat_id": "${chatId}", "text": "${messageText}"}' https://api.telegram.org/bot${botToken}/${selectedOption}`;
-        } else if (selectedOption === "sendPhoto") {
-            curlCommand = `curl -X POST -H "Content-Type: multipart/form-data" -F "chat_id=${chatId}" -F "photo=@${photoFile.name}" -F "caption=${messageText}" https://api.telegram.org/bot${botToken}/${selectedOption}`;
-        } else if (selectedOption === "sendDocument") {
-            curlCommand = `curl -X POST -H "Content-Type: multipart/form-data" -F "chat_id=${chatId}" -F "document=@${documentFile.name}" -F "caption=${messageText}" https://api.telegram.org/bot${botToken}/${selectedOption}`;
+    const fileField = $derived(methods[method].field);
+    const textField = $derived(method === "sendMessage" ? "text" : "caption");
+    const endpoint = $derived(`https://api.telegram.org/bot${botToken}/${method}`);
+
+    const missing = $derived.by(() => {
+        if (!botToken.trim()) return "Bot token is required.";
+        if (!chatId.trim()) return "Chat ID is required.";
+        if (method === "sendMessage" && !text.trim()) return "Message is required.";
+        if (fileField && !file) return "Choose a file to upload.";
+        return "";
+    });
+
+    // Single-quote a value for POSIX shells.
+    const quote = (value) => `'${String(value).replace(/'/g, `'\\''`)}'`;
+
+    const curl = $derived.by(() => {
+        const fields = [["chat_id", chatId]];
+        if (text) fields.push([textField, text]);
+        if (parseMode) fields.push(["parse_mode", parseMode]);
+        const args = fields.map(([key, value]) => `-F ${quote(`${key}=${value}`)}`);
+        if (fileField) args.push(`-F ${quote(`${fileField}=@${file?.name ?? "file"}`)}`);
+        return `curl -X POST ${args.join(" ")} ${quote(endpoint)}`;
+    });
+
+    const send = async () => {
+        error = "";
+        response = "";
+        if (missing) {
+            error = missing;
+            return;
         }
 
-        navigator.clipboard.writeText(curlCommand);
-        alert("Curl command copied to clipboard!");
+        const body = new FormData();
+        body.append("chat_id", chatId.trim());
+        if (text) body.append(textField, text);
+        if (parseMode) body.append("parse_mode", parseMode);
+        if (fileField) body.append(fileField, file);
+
+        sending = true;
+        try {
+            const result = await fetch(`https://api.telegram.org/bot${botToken.trim()}/${method}`, {
+                method: "POST",
+                body
+            });
+            response = JSON.stringify(await result.json(), null, 2);
+        } catch (e) {
+            error = `Request failed: ${e.message}`;
+        } finally {
+            sending = false;
+        }
     };
 </script>
 
 <svelte:head>
-    <title>Telegram Bot Testing</title>
+    <title>Telegram Bot Testing | Mools</title>
 </svelte:head>
-<h1 class="title text-center mb-3">Telegram Bot Testing</h1>
-<div class="row">
-    <div class="col-md-6">
-        <div class="card p-3">
-            <input
-                class="form-control mb-3"
-                placeholder="BOT TOKEN"
-                bind:value={botToken}
-            />
-            <input
-                class="form-control mb-3"
-                placeholder="CHAT ID"
-                bind:value={chatId}
-            />
-            <input
-                class="form-control mb-3"
-                placeholder="MESSAGE"
-                bind:value={messageText}
-            />
+
+<h1>Telegram Bot Testing</h1>
+<p class="text-body-secondary mb-3">
+    Requests go straight from your browser to api.telegram.org. Your bot token is never stored or sent anywhere else.
+</p>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <form class="card p-3" onsubmit={(e) => { e.preventDefault(); send(); }}>
             <div class="mb-3">
-                <select
-                    class="form-select"
-                    id="example-select-1"
-                    bind:value={selectedOption}
-                >
-                    <option value="sendMessage">Send Message</option>
-                    <option value="sendPhoto">Send Photo</option>
-                    <option value="sendDocument">Send Document</option>
+                <label for="bot-token" class="form-label">Bot Token</label>
+                <input id="bot-token" type="password" class="form-control" autocomplete="off" placeholder="123456:ABC-DEF..." bind:value={botToken} />
+            </div>
+            <div class="mb-3">
+                <label for="chat-id" class="form-label">Chat ID</label>
+                <input id="chat-id" class="form-control" placeholder="@channelname or numeric id" bind:value={chatId} />
+            </div>
+            <div class="mb-3">
+                <label for="method" class="form-label">Method</label>
+                <select id="method" class="form-select" bind:value={method} onchange={() => (file = null)}>
+                    {#each Object.entries(methods) as [key, item] (key)}
+                        <option value={key}>{item.label}</option>
+                    {/each}
                 </select>
             </div>
-
-            {#if selectedOption === "sendPhoto"}
+            <div class="mb-3">
+                <label for="text" class="form-label">{method === "sendMessage" ? "Message" : "Caption"}</label>
+                <textarea id="text" class="form-control" rows="3" bind:value={text}></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="parse-mode" class="form-label">Parse Mode</label>
+                <select id="parse-mode" class="form-select w-auto" bind:value={parseMode}>
+                    <option value="">None</option>
+                    <option value="HTML">HTML</option>
+                    <option value="MarkdownV2">MarkdownV2</option>
+                </select>
+            </div>
+            {#if fileField}
                 <div class="mb-3">
-                    <label for="images" class="form-label"
-                        >Upload Photo</label
-                    >
+                    <label for="file" class="form-label">{fileField === "photo" ? "Photo" : "Document"}</label>
                     <input
+                        id="file"
                         class="form-control"
                         type="file"
-                        id="images"
-                        accept="image/*"
-                        on:change={(e) => (photoFile = e.target.files[0])}
+                        accept={methods[method].accept}
+                        onchange={(e) => (file = e.currentTarget.files[0] ?? null)}
                     />
                 </div>
             {/if}
 
-            {#if selectedOption === "sendDocument"}
-            <div class="mb-3">
-                <label for="doc" class="form-label"
-                    >Upload Document</label
-                >
-                <input
-                    class="form-control"
-                    type="file"
-                    id="doc"
-                    on:change={(e) => (documentFile = e.target.files[0])}
-                />
-            </div>
+            {#if error}
+                <div class="alert alert-danger py-2" role="alert">{error}</div>
             {/if}
 
-            <button class="btn btn-primary" on:click={sendMessage}>Execute</button>
+            <div>
+                <button class="btn btn-primary" type="submit" disabled={sending}>
+                    {sending ? "Sending..." : "Execute"}
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="col-lg-6">
+        <div class="mb-3">
+            <OutputCard title="cURL Command" text={curl} />
         </div>
-    </div>
-    <div class="col-md-6">
-
-    {#if responseMessage}
-    <div class="card p-3">
-        <h2 class="card-title">Response:</h2>
-        <pre>{responseMessage}</pre>
-        <button class="btn btn-primary" on:click={getCurlCommand}>Copy Curl Command</button>
-    </div>
-{/if}
+        {#if response}
+            <OutputCard title="Response" text={response} filename="response.json" mime="application/json" />
+        {/if}
     </div>
 </div>

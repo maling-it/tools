@@ -1,22 +1,29 @@
 <script>
-    let text ='';
-    function handleEncode() {
-        text = encodeURIComponent(text);
-    }
+    import ToolPage from "../../../components/ToolPage.svelte";
+    import { urlEncode, urlDecode } from "#lib/textUtils.js";
 
-    function handleDecode() {
-        text = decodeURIComponent(text);
-    }
+    let text = $state("");
+
+    const actions = [
+        { label: "Encode", transform: urlEncode },
+        {
+            label: "Decode",
+            transform: (value) => {
+                try {
+                    return urlDecode(value);
+                } catch {
+                    throw new Error("Malformed URL encoding, check for a stray % sign.");
+                }
+            }
+        }
+    ];
 </script>
 
-<svelte:head>
-    <title>URL Encode/Decode Tool</title>
-</svelte:head>
-
-<h1>URL Encode/Decode Tool</h1>
-<div>
-    <label for="example-textarea-1" class="form-label">Description</label>
-    <textarea bind:value={text} class="form-control" id="example-textarea-1" rows="6" placeholder="Enter your URL here"></textarea>
-</div>
-<button class="btn btn-primary" type="button" on:click={handleEncode}>Encode</button>
-<button class="btn btn-primary" type="button" on:click={handleDecode}>Decode</button>
+<ToolPage
+    title="URL Encode/Decode Tool"
+    description="Percent-encode text for use in a URL, or decode it back."
+    bind:value={text}
+    label="URL or Text"
+    placeholder="Enter your URL here"
+    {actions}
+/>

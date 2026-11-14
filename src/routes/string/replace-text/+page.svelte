@@ -1,33 +1,28 @@
 <script>
     import ToolPage from "../../../components/ToolPage.svelte";
+    import { replaceText } from "#lib/textUtils.js";
 
-    let text = '';
-    let find = '';
-    let replaceWith = '';
+    let text = $state("");
+    let find = $state("");
+    let replacement = $state("");
+    let regex = $state(false);
+    let caseSensitive = $state(true);
+    let error = $state("");
+    let status = $state("");
 
-    $: additionalInputs = [
+    const actions = [
         {
-            id: "find-input",
-            label: "Find",
-            type: "text",
-            placeholder: "Enter the text you want to replace",
-            value: find,
-            onInput: (e) => { find = e.target.value; }
-        },
-        {
-            id: "replace-input", 
-            label: "Replace With",
-            type: "text",
-            placeholder: "Enter the replacement text",
-            value: replaceWith,
-            onInput: (e) => { replaceWith = e.target.value; }
-        }
-    ];
-
-    const buttons = [
-        {
-            label: "Replace",
-            onClick: () => { text = text.split(find).join(replaceWith); }
+            label: "Replace All",
+            transform: (value) => {
+                status = "";
+                try {
+                    const result = replaceText(value, find, replacement, { regex, caseSensitive });
+                    status = `${result.count} replacement${result.count === 1 ? "" : "s"} made.`;
+                    return result.text;
+                } catch {
+                    throw new Error("Invalid regular expression.");
+                }
+            }
         }
     ];
 </script>
@@ -35,9 +30,31 @@
 <ToolPage
     title="Replace Text Tool"
     description="Find and replace text in your content."
-    bind:textValue={text}
-    textPlaceholder="Enter your text here"
-    textLabel="Text"
-    {additionalInputs}
-    {buttons}
-/>
+    bind:value={text}
+    bind:error
+    {actions}
+>
+    {#snippet extra()}
+        <div class="mb-3">
+            <label for="find-input" class="form-label">Find</label>
+            <input id="find-input" class="form-control font-monospace" bind:value={find} placeholder="Text to find" />
+        </div>
+        <div class="mb-3">
+            <label for="replace-input" class="form-label">Replace With</label>
+            <input id="replace-input" class="form-control font-monospace" bind:value={replacement} placeholder="Replacement text" />
+        </div>
+        <div class="mb-3 d-flex gap-3 flex-wrap">
+            <div class="form-check">
+                <input id="regex-check" class="form-check-input" type="checkbox" bind:checked={regex} />
+                <label class="form-check-label" for="regex-check">Regular expression</label>
+            </div>
+            <div class="form-check">
+                <input id="case-check" class="form-check-input" type="checkbox" bind:checked={caseSensitive} />
+                <label class="form-check-label" for="case-check">Case sensitive</label>
+            </div>
+        </div>
+        {#if status && !error}
+            <p class="small text-body-secondary">{status}</p>
+        {/if}
+    {/snippet}
+</ToolPage>
