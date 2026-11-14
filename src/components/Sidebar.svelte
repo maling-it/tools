@@ -34,7 +34,7 @@
         ].filter((group) => group.links.length > 0)
     );
 
-    const isActive = (path) => page.url.pathname === resolve(`${path}/`);
+    const isActive = (path) => page.url.pathname === `${base}${path}/`;
 
     const onKeydown = (event) => {
         const typing = ["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName);
