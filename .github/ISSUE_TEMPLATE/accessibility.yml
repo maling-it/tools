@@ -1,0 +1,32 @@
+name: Accessibility report
+description: Something is hard or impossible to use with a keyboard, a screen reader, zoom or high contrast
+title: "Accessibility: "
+labels: ["accessibility"]
+projects: ["maling-it/3"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for telling us. Mools aims to meet WCAG 2.1 AA, and reports like this show us where it falls short. See the [accessibility statement](https://github.com/maling-it/tools/blob/master/.github/ACCESSIBILITY.md).
+  - type: input
+    id: tool
+    attributes:
+      label: Tool or page
+      placeholder: Command palette, or Regex Tester
+  - type: input
+    id: page
+    attributes:
+      label: Page URL
+      placeholder: https://maling-it.github.io/tools/string/regex-tester/
+  - type: textarea
+    id: description
+    attributes:
+      label: What is the barrier?
+      description: What were you trying to do, what happened and what would have helped?
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and assistive technology
+      placeholder: Firefox 130 with NVDA 2024.4, or Safari on iOS with VoiceOver

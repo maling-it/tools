@@ -132,10 +132,11 @@ The `Release` workflow then checks that the tag matches `package.json` and the c
 
 ## Contributing
 
-Bug reports, tool requests and pull requests are welcome.
+Bug reports, tool requests and pull requests are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md); it covers setup, how to add a tool and how to send a pull request.
 
-- Open an [issue](https://github.com/maling-it/tools/issues/new/choose) using one of the templates. For security problems, use a [private security advisory](https://github.com/maling-it/tools/security/advisories/new).
-- Before opening a pull request, run `bun run test` and `bun run build`.
+- Open an [issue](https://github.com/maling-it/tools/issues/new/choose) using one of the forms (bug, tool request, accessibility report or feedback).
+- Security problems go through the [security policy](.github/SECURITY.md), privately.
+- Everyone taking part follows the [Code of Conduct](.github/CODE_OF_CONDUCT.md). See also the [accessibility statement](.github/ACCESSIBILITY.md) and [how to get help](.github/SUPPORT.md).
 - Sign off your commits (`git commit -s`) and write the subject in the imperative mood, for example `Add CSS minifier tool`.
 
 ## License
