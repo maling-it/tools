@@ -1,101 +1,71 @@
 <script>
-    import { base } from '#lib/paths.js';
+    import { resolve } from "$app/paths";
+    import { base } from "#lib/paths.js";
+    import { tools } from "#lib/tools.js";
+    import { REPO_URL } from "#lib/site.js";
+    import { ISSUE_TYPES, buildIssueUrl } from "#lib/contact.js";
 
-    const teamMembers = [
-        {
-            name: "Memet",
-            role: "Creator & Developer",
-            description: "Full-stack developer passionate about creating useful tools for the community",
-            icon: "bi-person-circle"
+    const channels = [
+        { title: "Report a bug", text: "Something broke or gave a wrong result? Tell us which tool and what you entered.", icon: "bi-bug", color: "text-danger", href: `${REPO_URL}/issues/new?template=bug_report.yml`, cta: "Open a bug report" },
+        { title: "Request a tool", text: "Missing a utility you reach for every day? Suggest it and we will look at adding it.", icon: "bi-lightbulb", color: "text-warning", href: `${REPO_URL}/issues/new?template=tool_request.yml`, cta: "Suggest a tool" },
+        { title: "Report a security issue", text: "Found a vulnerability? Please report it privately so it can be fixed before it is public.", icon: "bi-shield-lock", color: "text-success", href: `${REPO_URL}/security/advisories/new`, cta: "Report privately" },
+        { title: "Contribute code", text: "Mools is open source. Fork the repo, add a tool and send a pull request.", icon: "bi-github", color: "text-primary", href: `${REPO_URL}#adding-a-tool`, cta: "Read the guide" }
+    ];
+
+    const faq = [
+        ["Is my data sent anywhere?", "No. Tools run in your browser and your input is never uploaded. The only network request the site makes by itself is a small call to GitHub for the star count."],
+        ["Can I use Mools offline?", "Not yet. After a page has loaded its tool keeps working without a connection, but the site is not installable as an offline app."],
+        ["Can my AI agent use these tools?", "Yes. Mools publishes llms.txt and tools.json, registers its tools with WebMCP in supporting browsers and ships an MCP server. See the README for setup."],
+        ["How do I get a reply?", "Issues are public on GitHub, so replies happen there. Please include the tool name and the steps to reproduce a problem."]
+    ];
+
+    let form = $state({ type: "bug", tool: "", title: "", message: "", includeBrowser: true });
+    let error = $state("");
+
+    const open = (event) => {
+        event.preventDefault();
+        error = "";
+        try {
+            const url = buildIssueUrl({
+                type: form.type,
+                tool: form.tool,
+                title: form.title,
+                message: form.message,
+                page: form.tool ? `${location.origin}${base}${tools.find((t) => t.title === form.tool)?.path ?? ""}/` : "",
+                userAgent: form.includeBrowser ? navigator.userAgent : ""
+            });
+            window.open(url, "_blank", "noopener");
+        } catch (e) {
+            error = e.message;
         }
-    ];
-
-    const features = [
-        {
-            title: "Privacy First",
-            description: "All processing happens locally in your browser. No data is sent to external servers.",
-            icon: "bi-shield-check",
-            color: "text-success"
-        },
-        {
-            title: "Open Source",
-            description: "Built with modern web technologies like SvelteKit and Bootstrap. Code is transparent.",
-            icon: "bi-code-square",
-            color: "text-info"
-        },
-        {
-            title: "Fast & Lightweight",
-            description: "Optimized for speed and efficiency. Works great on all devices and connections.",
-            icon: "bi-lightning",
-            color: "text-warning"
-        },
-        {
-            title: "Mobile Friendly",
-            description: "Responsive design that works perfectly on desktop, tablet, and mobile devices.",
-            icon: "bi-phone",
-            color: "text-primary"
-        }
-    ];
-
-    const techStack = [
-        { name: "SvelteKit", description: "Modern web framework" },
-        { name: "Bootstrap", description: "UI framework with Halfmoon theme" },
-        { name: "JavaScript", description: "Client-side processing" },
-        { name: "Vite", description: "Build tool and dev server" }
-    ];
+    };
 </script>
 
 <svelte:head>
-    <title>About Mools - Contact & Information</title>
-    <meta name="description" content="Learn more about Mools, our mission to provide useful online tools for developers and creators.">
+    <title>Contact | Mools</title>
+    <meta name="description" content="Report a bug, request a tool, report a security issue or contribute to Mools, the open source developer tools collection." />
 </svelte:head>
 
-<!-- Hero Section -->
 <div class="text-center mb-5">
-    <img src="{base}/favicon.png" width="120" class="mb-3" alt="Mools Logo">
-    <h1 class="display-5 mb-3">About Mools</h1>
-    <p class="lead text-muted">
-        Making useful tools accessible to everyone, everywhere
-    </p>
+    <img src="{base}/favicon.png" width="96" class="mb-3" alt="Mools logo" />
+    <h1 class="display-5 mb-3">Get in touch</h1>
+    <p class="lead text-body-secondary mb-0">Mools has no accounts or backend, so everything happens on GitHub in the open.</p>
 </div>
 
-<!-- Mission Section -->
-<section class="mb-5">
-    <div class="card">
-        <div class="card-body">
-            <h2 class="h4 mb-3">
-                <i class="bi bi-bullseye me-2"></i>
-                Our Mission
-            </h2>
-            <p class="mb-3">
-                Mools was created to provide developers, content creators, and digital workers with 
-                quick access to essential online tools. Our goal is to make powerful utilities 
-                available without the need for downloads, registrations, or complex setups.
-            </p>
-            <p class="mb-0">
-                Every tool is designed with privacy, speed, and usability in mind. We believe that 
-                useful software should be simple, fast, and respectful of your data.
-            </p>
-        </div>
-    </div>
-</section>
-
-<!-- Features Section -->
-<section class="mb-5">
-    <h2 class="h4 mb-4">Why Choose Mools?</h2>
-    <div class="row g-4">
-        {#each features as feature}
+<section class="mb-5" aria-labelledby="channels-heading">
+    <h2 id="channels-heading" class="visually-hidden">Ways to reach us</h2>
+    <div class="row g-3">
+        {#each channels as channel (channel.title)}
             <div class="col-md-6">
                 <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="feature-icon me-3 {feature.color}">
-                                <i class="{feature.icon} fs-3"></i>
-                            </div>
-                            <div>
-                                <h5 class="card-title mb-2">{feature.title}</h5>
-                                <p class="card-text text-muted">{feature.description}</p>
-                            </div>
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi {channel.icon} fs-3 me-3 {channel.color}"></i>
+                            <h3 class="h5 mb-0">{channel.title}</h3>
+                        </div>
+                        <p class="text-body-secondary flex-grow-1">{channel.text}</p>
+                        <div>
+                            <a class="btn btn-outline-primary btn-sm" href={channel.href} target="_blank" rel="noopener noreferrer">{channel.cta} <i class="bi bi-box-arrow-up-right ms-1"></i></a>
                         </div>
                     </div>
                 </div>
@@ -104,182 +74,76 @@
     </div>
 </section>
 
-<!-- Team Section -->
-<section class="mb-5">
-    <h2 class="h4 mb-4">Meet the Team</h2>
-    <div class="row g-4">
-        {#each teamMembers as member}
-            <div class="col-md-4">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <div class="team-avatar mb-3">
-                            <i class="{member.icon} fs-1"></i>
+<section class="mb-5" aria-labelledby="form-heading">
+    <div class="card">
+        <div class="card-body">
+            <h2 id="form-heading" class="h4 mb-1">Write it here, send it on GitHub</h2>
+            <p class="text-body-secondary mb-4">Fill in the form and we open a pre-filled GitHub issue for you to review and submit. A free GitHub account is needed to submit it.</p>
+            <form onsubmit={open}>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="type" class="form-label">Type</label>
+                        <select id="type" class="form-select" bind:value={form.type}>
+                            {#each Object.entries(ISSUE_TYPES) as [id, meta] (id)}
+                                <option value={id}>{meta.label}</option>
+                            {/each}
+                        </select>
+                    </div>
+                    <div class="col-md-8">
+                        <label for="tool" class="form-label">Tool (optional)</label>
+                        <select id="tool" class="form-select" bind:value={form.tool}>
+                            <option value="">Not about a specific tool</option>
+                            {#each [...tools].sort((a, b) => a.title.localeCompare(b.title)) as tool (tool.path)}
+                                <option>{tool.title}</option>
+                            {/each}
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label for="title" class="form-label">Title</label>
+                        <input id="title" class="form-control" placeholder="A short summary" bind:value={form.title} />
+                    </div>
+                    <div class="col-12">
+                        <label for="message" class="form-label">Details</label>
+                        <textarea id="message" class="form-control" rows="6" placeholder={form.type === "bug" ? "What did you do, what did you expect and what happened instead?" : form.type === "tool" ? "What should the tool do? Share an example input and output." : "What is on your mind?"} bind:value={form.message}></textarea>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input id="browser" class="form-check-input" type="checkbox" bind:checked={form.includeBrowser} />
+                            <label class="form-check-label" for="browser">Include my browser details (helps to reproduce bugs)</label>
                         </div>
-                        <h5 class="card-title">{member.name}</h5>
-                        <p class="text-primary small fw-medium mb-2">{member.role}</p>
-                        <p class="card-text text-muted small">{member.description}</p>
+                    </div>
+                    {#if error}
+                        <div class="col-12"><div class="alert alert-danger py-2 mb-0" role="alert">{error}</div></div>
+                    {/if}
+                    <div class="col-12">
+                        <button class="btn btn-primary" type="submit"><i class="bi bi-github me-1"></i>Open on GitHub</button>
                     </div>
                 </div>
-            </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="mb-5" aria-labelledby="faq-heading">
+    <h2 id="faq-heading" class="h4 mb-3">Questions</h2>
+    <div class="d-flex flex-column gap-2">
+        {#each faq as [question, answer] (question)}
+            <details class="card">
+                <summary class="card-body py-3 fw-semibold">{question}</summary>
+                <div class="card-body pt-0 text-body-secondary">{answer}</div>
+            </details>
         {/each}
     </div>
 </section>
 
-<!-- Tech Stack Section -->
-<section class="mb-5">
-    <div class="card">
-        <div class="card-body">
-            <h3 class="h5 mb-3">
-                <i class="bi bi-gear me-2"></i>
-                Technology Stack
-            </h3>
-            <p class="text-muted mb-3">
-                Mools is built with modern, reliable technologies to ensure performance and maintainability.
-            </p>
-            <div class="row">
-                {#each techStack as tech}
-                    <div class="col-md-6 mb-2">
-                        <div class="d-flex align-items-center">
-                            <span class="badge bg-primary me-2">{tech.name}</span>
-                            <span class="small text-muted">{tech.description}</span>
-                        </div>
-                    </div>
-                {/each}
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Statistics Section -->
-<section class="mb-5">
-    <div class="card bg-body-tertiary">
-        <div class="card-body text-center">
-            <h3 class="h5 mb-4">Project Statistics</h3>
-            <div class="row">
-                <div class="col-6 col-md-3">
-                    <div class="stat-box">
-                        <div class="stat-number h3 text-primary">9+</div>
-                        <div class="stat-label small text-muted">Active Tools</div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="stat-box">
-                        <div class="stat-number h3 text-success">3</div>
-                        <div class="stat-label small text-muted">Categories</div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="stat-box">
-                        <div class="stat-number h3 text-info">100%</div>
-                        <div class="stat-label small text-muted">Open Source</div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="stat-box">
-                        <div class="stat-number h3 text-warning">0</div>
-                        <div class="stat-label small text-muted">Data Collected</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Contact Section -->
-<section class="mb-5">
-    <div class="card">
-        <div class="card-body">
-            <h3 class="h5 mb-3">
-                <i class="bi bi-envelope me-2"></i>
-                Get in Touch
-            </h3>
-            <div class="row">
-                <div class="col-md-6">
-                    <h6 class="fw-bold">Feedback & Suggestions</h6>
-                    <p class="small text-muted mb-3">
-                        Have ideas for new tools or improvements? We'd love to hear from you! 
-                        Your feedback helps us build better tools for everyone.
-                    </p>
-                </div>
-                <div class="col-md-6">
-                    <h6 class="fw-bold">Report Issues</h6>
-                    <p class="small text-muted mb-3">
-                        Found a bug or having trouble with a tool? Let us know so we can 
-                        fix it quickly and improve the experience for all users.
-                    </p>
-                </div>
-            </div>
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle me-2"></i>
-                <strong>Contributing:</strong> Interested in contributing? This project is open source 
-                and welcomes contributions from developers of all skill levels.
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Future Plans -->
-<section class="mb-5">
-    <div class="card">
-        <div class="card-body">
-            <h3 class="h5 mb-3">
-                <i class="bi bi-rocket me-2"></i>
-                What's Next?
-            </h3>
-            <div class="row">
-                <div class="col-md-6">
-                    <h6 class="fw-bold">Planned Features</h6>
-                    <ul class="list-unstyled small">
-                        <li class="mb-1">• More converter tools (JSON, XML, YAML)</li>
-                        <li class="mb-1">• Advanced text processing utilities</li>
-                        <li class="mb-1">• API testing and validation tools</li>
-                        <li class="mb-1">• Color palette and design utilities</li>
-                    </ul>
-                </div>
-                <div class="col-md-6">
-                    <h6 class="fw-bold">Improvements</h6>
-                    <ul class="list-unstyled small">
-                        <li class="mb-1">• Enhanced mobile experience</li>
-                        <li class="mb-1">• Keyboard shortcuts for power users</li>
-                        <li class="mb-1">• Tool favorites and history</li>
-                        <li class="mb-1">• Offline functionality improvements</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+<p class="text-center text-body-secondary">
+    Mools is maintained by <a href="https://github.com/maling-it" rel="noreferrer">maling-it</a>.
+    Learn more on the <a href={resolve("/about/")}>About page</a>.
+</p>
 
 <style>
-    .feature-icon {
-        width: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .team-avatar {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: var(--bs-light);
-        color: var(--bs-primary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto;
-    }
-
-    .stat-box {
-        padding: 1rem;
-    }
-
-    .stat-number {
-        font-weight: bold;
-        margin-bottom: 0.25rem;
-    }
-
-    .stat-label {
-        font-size: 0.875rem;
+    summary {
+        cursor: pointer;
+        list-style-position: inside;
     }
 </style>
