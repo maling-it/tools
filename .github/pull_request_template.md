@@ -1,3 +1,5 @@
+<!-- Please read CONTRIBUTING.md first. -->
+
 ## Summary
 
 <!-- What does this change and why? Link the issue it closes, e.g. "Closes #12". -->
