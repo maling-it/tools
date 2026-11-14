@@ -58,6 +58,13 @@ export const categories = [
         icon: 'robot'
     },
     {
+        id: 'bulk',
+        name: 'Bulk Tools',
+        sidebarName: 'Bulk Tools',
+        description: 'Process many lines, files or images in one go',
+        icon: 'collection'
+    },
+    {
         id: 'testing',
         name: 'Testing Tools',
         sidebarName: 'Testing',
@@ -893,6 +900,78 @@ export const tools = [
         sidebarName: 'MCP Config',
         description: 'Generate MCP server config for Claude, Cursor and VS Code',
         icon: 'plug'
+    },
+    {
+        category: 'bulk',
+        slug: 'bulk-text-transformer',
+        title: 'Bulk Text Transformer',
+        sidebarName: 'Bulk Text Transformer',
+        description: 'Apply an operation to every line: encode, case, slugify, hash and more',
+        icon: 'list-nested'
+    },
+    {
+        category: 'bulk',
+        slug: 'bulk-file-hasher',
+        title: 'Bulk File Hasher',
+        sidebarName: 'Bulk File Hasher',
+        description: 'Hash many files with MD5 and SHA at once',
+        icon: 'file-earmark-lock'
+    },
+    {
+        category: 'bulk',
+        slug: 'bulk-image-converter',
+        title: 'Bulk Image Converter',
+        sidebarName: 'Bulk Image Converter',
+        description: 'Convert, resize and compress many images and get a ZIP',
+        icon: 'images'
+    },
+    {
+        category: 'bulk',
+        slug: 'bulk-qr-generator',
+        title: 'Bulk QR Code Generator',
+        sidebarName: 'Bulk QR Generator',
+        description: 'Turn a list into QR codes and download them as a ZIP',
+        icon: 'qr-code-scan'
+    },
+    {
+        category: 'bulk',
+        slug: 'bulk-file-renamer',
+        title: 'Bulk File Renamer',
+        sidebarName: 'Bulk File Renamer',
+        description: 'Rename many files with rules, numbering and a shell script',
+        icon: 'input-cursor-text'
+    },
+    {
+        category: 'bulk',
+        slug: 'bulk-find-replace',
+        title: 'Bulk File Find & Replace',
+        sidebarName: 'Bulk Find & Replace',
+        description: 'Find and replace text across many files and download a ZIP',
+        icon: 'files'
+    },
+    {
+        category: 'bulk',
+        slug: 'data-extractor',
+        title: 'Data Extractor',
+        sidebarName: 'Data Extractor',
+        description: 'Extract emails, URLs, IPs and more from any text',
+        icon: 'funnel-fill'
+    },
+    {
+        category: 'bulk',
+        slug: 'csv-splitter',
+        title: 'CSV Splitter',
+        sidebarName: 'CSV Splitter',
+        description: 'Split a large CSV into smaller files',
+        icon: 'scissors'
+    },
+    {
+        category: 'bulk',
+        slug: 'text-chunker',
+        title: 'Text Chunker',
+        sidebarName: 'Text Chunker',
+        description: 'Split long text into token-sized chunks for AI models',
+        icon: 'distribute-vertical'
     },
     {
         category: 'testing',

@@ -12,6 +12,7 @@ import { explainCron, formatSql, jsonDiff, markdownToHtml, nextCronRuns, textDif
 import { HTTP_STATUS, MIME_TYPES } from './reference.js';
 import { PROMPTS } from './prompts.js';
 import { COMMIT_TYPES, RULE_FORMATS, buildCommitMessage, buildDesignMd, buildLlmsTxt, buildMcpConfig, buildPrompt, buildRulesFile, estimateCost, estimateTokens, extractVariables, fillTemplate } from './vibe.js';
+import { LINE_OPERATIONS, EXTRACTORS, chunkText, extractData, planRename, renameScript, runBulk, splitCsv } from './bulk.js';
 import { caseConverters, escapeHtml, escapeJs, escapeXml, replaceText, textStats, unescapeHtml, unescapeJs, unescapeXml, urlDecode, urlEncode } from './textUtils.js';
 
 const string = (description, extra = {}) => ({ type: 'string', description, ...extra });
@@ -535,6 +536,70 @@ export const agentTools = [
         description: 'Generate the config that registers an MCP server with Claude Desktop, Cursor, VS Code or Claude Code.',
         inputSchema: object({ client: string('Client', { enum: ['claude-desktop', 'cursor', 'vscode', 'claude-code'] }), name: string('Server name'), command: string('Command to run'), args: string('Arguments, one per line'), env: string('Environment variables as NAME=value lines') }, ['client', 'command']),
         run: (args) => buildMcpConfig(args)
+    },
+    {
+        name: 'bulk_transform',
+        description: 'Apply one operation to every line of a list (encode, decode, case, slugify, hash, URL cleanup, affix, find and replace). Returns JSON rows with input, output and any per-line error.',
+        inputSchema: object(
+            {
+                text: string('Lines of text, one item per line'),
+                operation: string('Operation id', { enum: LINE_OPERATIONS.map((op) => op.id) }),
+                prefix: string('For operation "affix"'),
+                suffix: string('For operation "affix"'),
+                find: string('For operation "replace"'),
+                replacement: string('For operation "replace"'),
+                regex: bool('Treat find as a regular expression'),
+                caseSensitive: bool('Case sensitive find, default true')
+            },
+            ['text', 'operation']
+        ),
+        run: async ({ text, operation, ...options }) => out(await runBulk(text, operation, options))
+    },
+    {
+        name: 'extract_data',
+        description: 'Extract emails, URLs, domains, IPv4 addresses, UUIDs, hashtags, mentions, HEX colors, numbers or phone numbers from text. One result per line.',
+        inputSchema: object({ text: string('Text to search'), kind: string('What to extract', { enum: Object.keys(EXTRACTORS) }), unique: bool('Remove duplicates, default true'), sort: bool('Sort the results') }, ['text', 'kind']),
+        run: ({ text, kind, unique = true, sort = false }) => extractData(text, kind, { unique, sort }).join('\n')
+    },
+    {
+        name: 'chunk_text',
+        description: 'Split long text into chunks that fit a token budget (estimated), breaking on paragraphs and sentences, with optional overlap. Returns JSON chunks.',
+        inputSchema: object({ text: string('Text to split'), maxTokens: number('Maximum estimated tokens per chunk, default 1000'), overlapTokens: number('Overlap between chunks in tokens, default 0') }, ['text']),
+        run: ({ text, maxTokens = 1000, overlapTokens = 0 }) => out(chunkText(text, { maxTokens, overlapTokens }))
+    },
+    {
+        name: 'plan_file_renames',
+        description: 'Plan new names for a list of file names (find and replace, prefix, suffix, case, numbering, extension) and get a shell script of mv commands. Nothing is renamed on disk.',
+        inputSchema: object(
+            {
+                names: { type: 'array', description: 'File names', items: string('A file name') },
+                find: string('Text or pattern to find in the name'),
+                replace: string('Replacement text'),
+                regex: bool('Treat find as a regular expression'),
+                prefix: string('Prefix'),
+                suffix: string('Suffix'),
+                caseMode: string('Name case', { enum: ['none', 'lower', 'upper', 'snake', 'kebab', 'camel', 'title'] }),
+                numbering: string('Add a counter', { enum: ['prefix', 'suffix', 'replace'] }),
+                start: number('First number, default 1'),
+                pad: number('Digits to pad the number to, default 1'),
+                extension: string('Extension handling', { enum: ['keep', 'lower', 'remove', 'set'] }),
+                newExtension: string('Extension for "set"')
+            },
+            ['names']
+        ),
+        run: ({ names, ...rules }) => {
+            const plan = planRename(names, rules);
+            return out({ plan, conflicts: plan.filter((p) => p.conflict).length, script: renameScript(plan) });
+        }
+    },
+    {
+        name: 'split_csv',
+        description: 'Split CSV text into several CSV files with a fixed number of rows, repeating the header. Returns JSON with the parts.',
+        inputSchema: object({ csv: string('CSV text'), rowsPerFile: number('Rows per file, default 1000'), header: bool('First row is a header, default true'), delimiter: string('Field delimiter, default ","') }, ['csv']),
+        run: ({ csv, rowsPerFile = 1000, header = true, delimiter = ',' }) => {
+            const parts = splitCsv(csv, { rowsPerFile, header, delimiter });
+            return out({ files: parts.length, parts });
+        }
     },
     {
         name: 'qr_code_svg',

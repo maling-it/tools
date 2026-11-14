@@ -230,3 +230,6 @@ export const uniqueWords = (text, { sort = false } = {}) => {
     const words = [...seen.values()];
     return (sort ? words.sort((a, b) => a.localeCompare(b)) : words).join('\n');
 };
+
+// Serializes rows (arrays of cells) back to CSV text.
+export const rowsToCsv = (rows, delimiter = ',') => rows.map((row) => row.map((cell) => csvCell(cell, delimiter)).join(delimiter)).join('\n');

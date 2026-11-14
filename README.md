@@ -5,8 +5,8 @@
 <h1 align="center">Mools</h1>
 
 <p align="center">
-  <strong>106 free developer tools that run in your browser.</strong><br />
-  Text, converters, security, SEO, generators, calculators, games and helpers for coding with AI.
+  <strong>115 free developer tools that run in your browser.</strong><br />
+  Text, converters, bulk tools, security, SEO, generators, calculators, games and helpers for coding with AI.
 </p>
 
 <p align="center">
@@ -50,6 +50,7 @@
 | SEO Tools | 2 | Title maker, meta tags |
 | Code Generators | 15 | QR codes, barcodes, UUID and ULID, cron, CSS buttons, SVG placeholders, lorem ipsum |
 | Calculators | 12 | Concrete, dirt, cap rate, crypto average, chmod, subnets, percentages, stopwatch |
+| Bulk Tools | 9 | Bulk text transformer, file hasher, image converter, QR codes, file renamer, find and replace, data extractor, CSV splitter, text chunker |
 | Games | 3 | Wordle, Tic Tac Toe, Memory Match |
 | AI & Vibe Coding | 9 | AGENTS.md and rules generator, prompt builder and library, repo packer, token counter, DESIGN.md, llms.txt, MCP config |
 | Testing Tools | 4 | HTTP status codes, MIME types, URL parser, Telegram bot tester |
@@ -91,7 +92,7 @@ docs/             logo and screenshots used by this README
 
 Mools is built to be used by AI agents as well as people:
 
-- **`/llms.txt`**, **`/tools.json`** and **`/sitemap.xml`** are generated from `src/lib/tools.js` at build time. `tools.json` also lists the JSON Schema of every callable tool (74 of them).
+- **`/llms.txt`**, **`/tools.json`** and **`/sitemap.xml`** are generated from `src/lib/tools.js` at build time. `tools.json` also lists the JSON Schema of every callable tool (79 of them).
 - **WebMCP**: in browsers that support `navigator.modelContext`, every tool in `src/lib/agentTools.js` is registered on each page, so in-browser agents can call them directly.
 - **MCP server**: `bun run mcp` starts a stdio MCP server (`mcp/server.js`). It provides:
   - **Tools**: every tool in `src/lib/agentTools.js`, annotated as read-only. Tools that parse HTML or XML use `jsdom` (an optional dependency); without it they are left out.

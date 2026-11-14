@@ -51,6 +51,18 @@ describe('agent tools', () => {
         expect(await callAgentTool('build_mcp_config', { client: 'claude-code', command: 'node', name: 'x' })).toBe('claude mcp add x -- node');
     });
 
+    it('runs bulk tools', async () => {
+        const rows = JSON.parse(await callAgentTool('bulk_transform', { text: 'a\nb', operation: 'upper' }));
+        expect(rows.map((r) => r.output)).toEqual(['A', 'B']);
+        expect(await callAgentTool('extract_data', { text: 'x@y.com and x@y.com', kind: 'emails' })).toBe('x@y.com');
+        expect(JSON.parse(await callAgentTool('chunk_text', { text: 'one\n\ntwo', maxTokens: 50 }))).toHaveLength(1);
+        const plan = JSON.parse(await callAgentTool('plan_file_renames', { names: ['A B.TXT'], caseMode: 'kebab', extension: 'lower' }));
+        expect(plan.plan[0].to).toBe('a-b.txt');
+        expect(plan.script).toContain("mv -n -- 'A B.TXT' 'a-b.txt'");
+        expect(JSON.parse(await callAgentTool('split_csv', { csv: 'a\n1\n2', rowsPerFile: 1 })).files).toBe(2);
+        await expect(callAgentTool('bulk_transform', { text: 'x', operation: 'nope' })).rejects.toThrow('Unknown operation');
+    });
+
     it('rejects unknown tools and missing arguments', async () => {
         await expect(callAgentTool('nope')).rejects.toThrow('Unknown tool');
         await expect(callAgentTool('base64', { text: 'x' })).rejects.toThrow('Missing required argument "mode"');
