@@ -1,32 +1,101 @@
-# Mools
+<p align="center">
+  <img src="docs/logo.png" alt="Mools logo" width="120" />
+</p>
 
-Maling-it Tools: a collection of client-side developer tools (string utilities, converters and API testing helpers) built with SvelteKit 3, Svelte 5, Bootstrap and Halfmoon. Everything runs in the browser and the site is deployed to GitHub Pages under `/tools`.
+<h1 align="center">Mools</h1>
+
+<p align="center">
+  <strong>106 free developer tools that run in your browser.</strong><br />
+  Text, converters, security, SEO, generators, calculators, games and helpers for coding with AI.
+</p>
+
+<p align="center">
+  <a href="https://maling-it.github.io/tools/"><strong>Open the site</strong></a> ·
+  <a href="https://maling-it.github.io/tools/llms.txt">llms.txt</a> ·
+  <a href="https://github.com/maling-it/tools/issues/new/choose">Report a bug or request a tool</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/maling-it/tools/actions/workflows/deploy.yml"><img alt="Deploy" src="https://github.com/maling-it/tools/actions/workflows/deploy.yml/badge.svg" /></a>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/home-light.png" alt="Mools home page in light mode" width="860" />
+</p>
+
+## Why Mools
+
+- **Private by design.** Every tool runs in your browser. Your input is never uploaded, there are no accounts and no backend.
+- **Fast to reach.** Press <kbd>Ctrl</kbd> + <kbd>K</kbd> anywhere to search all tools, or use the sidebar and the home page search.
+- **Pleasant to use.** Light, dark and automatic themes, three Halfmoon styles, a layout that works on phones and a copy button wherever there is output.
+- **Built for AI agents too.** Every tool is also exposed through `llms.txt`, `tools.json`, WebMCP and an MCP server.
+
+## Screenshots
+
+| Command palette | Tool page (dark) |
+| --- | --- |
+| ![Command palette searching for json](docs/screenshots/command-palette.png) | ![JSON Formatter in dark mode](docs/screenshots/tool-dark.png) |
+
+| Prompt library (dark) | On a phone |
+| --- | --- |
+| ![Prompt library with a filled-in prompt](docs/screenshots/prompt-library-dark.png) | <img src="docs/screenshots/home-mobile.png" alt="Mools home page on a phone" width="260" /> |
+
+## What is inside
+
+| Category | Tools | Examples |
+| --- | ---: | --- |
+| String Tools | 14 | HTML, XML, JS and URL escaping, case converter, regex tester, text diff, word counter |
+| Converters | 38 | CSV, JSON, YAML, TOML and XML, Markdown to HTML, SQL formatter, images to PDF, HEIC, Base64, colors, units |
+| Security & Privacy | 9 | Password generators, hashes (MD5 and SHA), JWT decoder, HMAC, TOTP, bcrypt, password strength |
+| SEO Tools | 2 | Title maker, meta tags |
+| Code Generators | 15 | QR codes, barcodes, UUID and ULID, cron, CSS buttons, SVG placeholders, lorem ipsum |
+| Calculators | 12 | Concrete, dirt, cap rate, crypto average, chmod, subnets, percentages, stopwatch |
+| Games | 3 | Wordle, Tic Tac Toe, Memory Match |
+| AI & Vibe Coding | 9 | AGENTS.md and rules generator, prompt builder and library, repo packer, token counter, DESIGN.md, llms.txt, MCP config |
+| Testing Tools | 4 | HTTP status codes, MIME types, URL parser, Telegram bot tester |
+
+Browse the full list on the [site](https://maling-it.github.io/tools/) or in [`src/lib/tools.js`](src/lib/tools.js).
 
 ## Development
+
+Requirements: [Bun](https://bun.sh) and Node.js 22.17 or newer.
 
 ```bash
 bun install
 bun run dev      # dev server on http://localhost:6969/tools/
-bun run test     # unit tests for src/lib
+bun run test     # unit tests (Vitest)
 bun run build    # static build into build/
-bun run preview
+bun run preview  # serve the production build
 ```
 
-## Adding a tool
+Pushes to `master` run the tests, build the site and deploy it to GitHub Pages (see `.github/workflows/deploy.yml`).
 
-1. Add an entry to `src/lib/tools.js`; the sidebar, home page, category pages and search pick it up automatically.
-2. Create `src/routes/<category>/<slug>/+page.svelte`. Most tools only need `ToolPage` with a list of `{ label, transform }` actions.
+### Project layout
+
+```
+src/lib/          tool logic (pure functions, covered by tests) and the tool registry
+src/components/   shared UI: ToolPage, ConvertPage, OutputCard, sidebar, command palette
+src/routes/       one folder per tool: <category>/<slug>/+page.svelte
+mcp/              the stdio MCP server
+docs/             logo and screenshots used by this README
+```
+
+### Adding a tool
+
+1. Add an entry to `src/lib/tools.js`. The sidebar, home page, category pages, search, `llms.txt`, `tools.json` and the sitemap all pick it up automatically.
+2. Create `src/routes/<category>/<slug>/+page.svelte`. Most tools only need `ToolPage` (text in, text out) or `ConvertPage` (live output).
 3. Put the logic in `src/lib` and cover it with a Vitest test.
+4. Optional: expose it to agents by adding an entry to `src/lib/agentTools.js`.
 
 ## Agent support
 
 Mools is built to be used by AI agents as well as people:
 
-- **`/llms.txt`**, **`/tools.json`** and **`/sitemap.xml`** are generated from `src/lib/tools.js` at build time. `tools.json` also lists the JSON Schema of every callable tool.
+- **`/llms.txt`**, **`/tools.json`** and **`/sitemap.xml`** are generated from `src/lib/tools.js` at build time. `tools.json` also lists the JSON Schema of every callable tool (74 of them).
 - **WebMCP**: in browsers that support `navigator.modelContext`, every tool in `src/lib/agentTools.js` is registered on each page, so in-browser agents can call them directly.
 - **MCP server**: `bun run mcp` starts a stdio MCP server (`mcp/server.js`). It provides:
   - **Tools**: every tool in `src/lib/agentTools.js`, annotated as read-only. Tools that parse HTML or XML use `jsdom` (an optional dependency); without it they are left out.
-  - **Prompts**: the prompt library (`src/lib/prompts.js`) as MCP prompts, with each `{{placeholder}}` as an argument.
+  - **Prompts**: the prompt library (`src/lib/prompts.js`, 24 prompts) as MCP prompts, with each `{{placeholder}}` as an argument.
   - **Resources**: `mools://catalog` (all web tools) and `mools://prompts` (the prompt library).
 
   Example client config (or generate one with the MCP Config Generator tool):
@@ -37,4 +106,16 @@ Mools is built to be used by AI agents as well as people:
 
 - Pages use labeled form fields and `SoftwareApplication` JSON-LD, so browser agents can also drive the UI.
 
-To expose a new tool to agents, add an entry to `src/lib/agentTools.js` (name, description, JSON Schema, `run`). To add a prompt, add it to `src/lib/prompts.js`; the website and the MCP server both pick it up.
+To add a prompt, add it to `src/lib/prompts.js`; the website and the MCP server both pick it up.
+
+## Contributing
+
+Bug reports, tool requests and pull requests are welcome.
+
+- Open an [issue](https://github.com/maling-it/tools/issues/new/choose) using one of the templates. For security problems, use a [private security advisory](https://github.com/maling-it/tools/security/advisories/new).
+- Before opening a pull request, run `bun run test` and `bun run build`.
+- Sign off your commits (`git commit -s`) and write the subject in the imperative mood, for example `Add CSS minifier tool`.
+
+## Built with
+
+[SvelteKit](https://svelte.dev) and Svelte 5, [Bootstrap](https://getbootstrap.com) with the [Halfmoon](https://www.gethalfmoon.com) themes, [Vite](https://vite.dev) and [Vitest](https://vitest.dev). Maintained by [maling-it](https://github.com/maling-it).

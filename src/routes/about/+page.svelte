@@ -1,5 +1,7 @@
 <script>
+    import { resolve } from '$app/paths';
     import { base } from '#lib/paths.js';
+    import { categories, tools } from '#lib/tools.js';
 
     const teamMembers = [
         {
@@ -11,6 +13,12 @@
     ];
 
     const features = [
+        {
+            title: "Built for AI Agents",
+            description: "Every tool is also available to agents through llms.txt, tools.json, WebMCP and an MCP server.",
+            icon: "bi-robot",
+            color: "text-danger"
+        },
         {
             title: "Privacy First",
             description: "All processing happens locally in your browser. No data is sent to external servers.",
@@ -38,10 +46,11 @@
     ];
 
     const techStack = [
-        { name: "SvelteKit", description: "Modern web framework" },
-        { name: "Bootstrap", description: "UI framework with Halfmoon theme" },
-        { name: "JavaScript", description: "Client-side processing" },
-        { name: "Vite", description: "Build tool and dev server" }
+        { name: "SvelteKit 3 + Svelte 5", description: "Web framework, prerendered to static pages" },
+        { name: "Bootstrap 5 + Halfmoon", description: "UI framework with three switchable themes" },
+        { name: "Vite 8", description: "Build tool and dev server" },
+        { name: "Vitest", description: "Unit tests for all tool logic" },
+        { name: "MCP + WebMCP", description: "Lets AI agents call the tools" }
     ];
 </script>
 
@@ -224,28 +233,27 @@
         <div class="card-body">
             <h3 class="h5 mb-3">
                 <i class="bi bi-rocket me-2"></i>
-                What's Next?
+                Recently Added
             </h3>
             <div class="row">
                 <div class="col-md-6">
-                    <h6 class="fw-bold">Planned Features</h6>
+                    <h6 class="fw-bold">Tools</h6>
                     <ul class="list-unstyled small">
-                        <li class="mb-1">• More converter tools (JSON, XML, YAML)</li>
-                        <li class="mb-1">• Advanced text processing utilities</li>
-                        <li class="mb-1">• API testing and validation tools</li>
-                        <li class="mb-1">• Color palette and design utilities</li>
+                        <li class="mb-1">• {tools.length} tools in {categories.length} categories</li>
+                        <li class="mb-1">• AI and vibe coding helpers: AGENTS.md generator, prompt library, repo packer</li>
+                        <li class="mb-1">• Developer utilities: JWT, regex, YAML/TOML, cron, subnets</li>
                     </ul>
                 </div>
                 <div class="col-md-6">
-                    <h6 class="fw-bold">Improvements</h6>
+                    <h6 class="fw-bold">Experience</h6>
                     <ul class="list-unstyled small">
-                        <li class="mb-1">• Enhanced mobile experience</li>
-                        <li class="mb-1">• Keyboard shortcuts for power users</li>
-                        <li class="mb-1">• Tool favorites and history</li>
-                        <li class="mb-1">• Offline functionality improvements</li>
+                        <li class="mb-1">• Command palette (Ctrl+K) and search everywhere</li>
+                        <li class="mb-1">• Light, dark and automatic themes</li>
+                        <li class="mb-1">• Recently used tools and related tool suggestions</li>
                     </ul>
                 </div>
             </div>
+            <p class="small text-body-secondary mt-3 mb-0">Missing something? <a href={resolve("/contact/")}>Tell us</a>.</p>
         </div>
     </div>
 </section>
@@ -262,7 +270,7 @@
         width: 80px;
         height: 80px;
         border-radius: 50%;
-        background: var(--bs-light);
+        background: var(--bs-tertiary-bg);
         color: var(--bs-primary);
         display: flex;
         align-items: center;

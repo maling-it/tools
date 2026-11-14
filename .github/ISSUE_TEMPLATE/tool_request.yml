@@ -1,0 +1,35 @@
+name: Tool request
+description: Suggest a new tool or an improvement to an existing one
+title: "Tool request: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Mools tools run entirely in the browser, with no server and no uploads. Ideas that fit that model are the easiest to add.
+  - type: input
+    id: tool
+    attributes:
+      label: Tool name
+      description: A short name, or the existing tool you would like improved.
+      placeholder: CSS minifier
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What should it do, and why do you need it?
+      description: Describe the problem it solves. An example input and the output you expect is ideal.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: Similar tools or references
+      description: Links to tools that do something similar, specs or documentation.
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contributing
+      options:
+        - label: I would like to build this tool myself (see the README for how to add one)

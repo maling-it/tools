@@ -1,0 +1,15 @@
+name: Feedback or question
+description: Ask a question or share an idea about the site, the agent features or the MCP server
+title: "Feedback: "
+labels: ["question"]
+body:
+  - type: input
+    id: tool
+    attributes:
+      label: Related tool or page (optional)
+  - type: textarea
+    id: description
+    attributes:
+      label: Your question or feedback
+    validations:
+      required: true

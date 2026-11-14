@@ -1,0 +1,45 @@
+name: Bug report
+description: Something is broken or gives a wrong result
+title: "Bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping to improve Mools. Everything runs in your browser, so please do not paste secrets such as real passwords, tokens or API keys.
+  - type: input
+    id: tool
+    attributes:
+      label: Tool
+      description: Which tool is affected?
+      placeholder: JSON Formatter
+  - type: input
+    id: page
+    attributes:
+      label: Page URL
+      placeholder: https://maling-it.github.io/tools/converter/json-formatter/
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect and what happened instead? An example input and output helps a lot.
+      placeholder: |
+        1. Open the tool
+        2. Enter ...
+        3. Click ...
+        Expected: ...
+        Actual: ...
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      placeholder: Firefox 130 on Android 14
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched the existing issues and did not find this bug
+          required: true
