@@ -1,7 +1,7 @@
 <script>
     import ThemeSwitcher from "./ThemeSwitcher.svelte";
     import SidebarLink from "./SidebarLink.svelte";
-    import { base } from "$app/paths";
+    import { base } from '#lib/paths.js';
     export let links = [
         { name: "Getting started", divider: true },
         { name: "About", url: "/about" },

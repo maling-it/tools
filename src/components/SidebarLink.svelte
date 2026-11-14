@@ -1,6 +1,6 @@
 <script>
-    import { page } from '$app/stores';
-    import {base} from '$app/paths';
+    import { page } from '$app/state';
+    import {base} from '#lib/paths.js';
     export let links = [];
 
     function isActive(link) {
@@ -20,7 +20,7 @@
         {:else}
             <li class="nav-item" key={index}>
                 <a
-                    class="nav-link {isActive(link)} {link.url === $page.url.pathname ? 'active' : ''}"
+                    class="nav-link {isActive(link)} {link.url === page.url.pathname ? 'active' : ''}"
                     href={base}{link.url}
                     aria-current={link.active ? "page" : null}
                 >

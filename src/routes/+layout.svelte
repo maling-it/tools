@@ -6,7 +6,7 @@
     import Sidebar from "../components/Sidebar.svelte";
     import "bootstrap-icons/font/bootstrap-icons.css";
     import { onMount, afterUpdate } from "svelte";
-    import {base} from "$app/paths";
+    import {base} from '#lib/paths.js';
     let loading = true;
 
     afterUpdate(() => {

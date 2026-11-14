@@ -1,8 +1,8 @@
 <script>
     import ThemeSwitcher from "./ThemeSwitcher.svelte";
     import CoreSwitcher from "./CoreSwitcher.svelte";
-    import { page } from "$app/stores";
-    import { base } from "$app/paths";
+    import { page } from "$app/state";
+    import { base } from '#lib/paths.js';
     import { onMount } from "svelte";
 
     let repoData;
@@ -52,7 +52,7 @@
             class="d-none d-lg-block text-truncate"
             style="color: hsla(var(--bs-emphasis-color-hsl), 0.7); letter-spacing: 1px;"
         >
-            {base}{$page.route.id}
+            {base}{page.route.id}
         </div>
         <div class="btn-group ms-auto d-md-none">
             <div class="btn-group">
