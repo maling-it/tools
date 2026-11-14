@@ -33,7 +33,7 @@
                 <i class="bi bi-layout-sidebar" aria-hidden="true"></i>
             </button>
 
-            <ThemeSwitcher />
+            <ThemeSwitcher align="start" />
         </div>
         <a
             href="{base}/"

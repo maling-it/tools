@@ -40,9 +40,11 @@
     <script>
       // Apply the saved theme before first paint to avoid a flash of the wrong theme.
       try {
-        var theme = localStorage.getItem("theme");
-        if (!theme) theme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-        document.documentElement.setAttribute("data-bs-theme", theme);
+        var mode = localStorage.getItem("theme");
+        if (mode !== "light" && mode !== "dark") mode = "auto";
+        var dark = matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.setAttribute("data-bs-theme", mode === "auto" ? (dark ? "dark" : "light") : mode);
+        document.documentElement.setAttribute("data-theme-mode", mode);
         var core = localStorage.getItem("core");
         if (core) document.documentElement.setAttribute("data-bs-core", core);
       } catch (e) {}

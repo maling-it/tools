@@ -12,6 +12,9 @@
         { id: "elegant", name: "Elegant", icon: "window", description: "Beautiful and classy, almost Tuftian." }
     ];
 
+    // Two switchers are rendered (navbar and collapsed menu), so ids must be unique per instance.
+    const uid = $props.id();
+
     let selectedCore = $state("default");
 
     const readStoredCore = () => {
@@ -32,7 +35,16 @@
         selectedCore = core;
     };
 
-    onMount(() => setCore(readStoredCore() ?? "default"));
+    onMount(() => {
+        setCore(readStoredCore() ?? "default");
+
+        // Follow the attribute so both switchers stay in sync.
+        const observer = new MutationObserver(() => {
+            selectedCore = document.documentElement.getAttribute("data-bs-core") ?? "default";
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-bs-core"] });
+        return () => observer.disconnect();
+    });
 </script>
 
 <div class="dropdown me-2">
@@ -54,15 +66,15 @@
                         <div class="core-theme-button col-12">
                             <input
                                 type="radio"
-                                name="core-picker"
+                                name="core-picker-{uid}"
                                 value={core.id}
                                 class="btn-check"
-                                id="{core.id}-core"
+                                id="{core.id}-core-{uid}"
                                 autocomplete="off"
                                 checked={selectedCore === core.id}
                                 onchange={() => setCore(core.id)}
                             />
-                            <label class="btn text-start d-block w-100 py-2 px-3" for="{core.id}-core">
+                            <label class="btn text-start d-block w-100 py-2 px-3" for="{core.id}-core-{uid}">
                                 <span class="d-flex align-items-center">
                                     <i class="bi bi-{core.icon} flex-shrink-0" style="width: 20px;"></i>
                                     {core.name}

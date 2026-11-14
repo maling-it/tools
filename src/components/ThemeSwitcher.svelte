@@ -1,44 +1,56 @@
 <script>
     import { onMount } from "svelte";
 
-    let theme = $state("dark");
+    const modes = [
+        { id: "light", name: "Light", icon: "sun" },
+        { id: "dark", name: "Dark", icon: "moon-stars" },
+        { id: "auto", name: "Auto", icon: "circle-half" }
+    ];
 
-    const readStoredTheme = () => {
+    // Which edge of the button the menu aligns to; use "start" when the button sits at the left of the screen.
+    let { align = "end" } = $props();
+
+    let mode = $state("auto");
+
+    const readStoredMode = () => {
         try {
-            return localStorage.getItem("theme");
+            const stored = localStorage.getItem("theme");
+            return modes.some((m) => m.id === stored) ? stored : "auto";
         } catch {
-            return null;
+            return "auto";
         }
     };
 
-    const preferredTheme = () =>
-        readStoredTheme() ?? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const resolve = (value) =>
+        value === "auto" ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : value;
 
-    const applyTheme = (value) => document.documentElement.setAttribute("data-bs-theme", value);
+    // The mode is kept on <html> so the two switchers (sidebar and navbar) always agree.
+    const apply = (value) => {
+        document.documentElement.setAttribute("data-bs-theme", resolve(value));
+        document.documentElement.setAttribute("data-theme-mode", value);
+    };
 
-    const toggleTheme = () => {
-        const next = theme === "dark" ? "light" : "dark";
+    const select = (value) => {
         try {
-            localStorage.setItem("theme", next);
+            localStorage.setItem("theme", value);
         } catch {
             // Storage can be unavailable (private mode); the choice then only lasts for this visit.
         }
-        applyTheme(next);
+        apply(value);
     };
 
     onMount(() => {
-        applyTheme(preferredTheme());
+        apply(readStoredMode());
+        mode = document.documentElement.getAttribute("data-theme-mode") ?? "auto";
 
-        // Two switchers exist (sidebar and navbar), so follow the attribute instead of local clicks.
         const observer = new MutationObserver(() => {
-            theme = document.documentElement.getAttribute("data-bs-theme") ?? "dark";
+            mode = document.documentElement.getAttribute("data-theme-mode") ?? "auto";
         });
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-bs-theme"] });
-        theme = document.documentElement.getAttribute("data-bs-theme") ?? "dark";
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme-mode"] });
 
         const media = window.matchMedia("(prefers-color-scheme: dark)");
         const onSystemChange = () => {
-            if (!readStoredTheme()) applyTheme(preferredTheme());
+            if (readStoredMode() === "auto") apply("auto");
         };
         media.addEventListener("change", onSystemChange);
 
@@ -47,14 +59,36 @@
             media.removeEventListener("change", onSystemChange);
         };
     });
+
+    const current = $derived(modes.find((m) => m.id === mode) ?? modes[2]);
 </script>
 
-<button
-    type="button"
-    class="btn btn-secondary"
-    aria-label="Toggle theme"
-    title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-    onclick={toggleTheme}
->
-    <i class="bi {theme === 'dark' ? 'bi-sun' : 'bi-moon'}"></i>
-</button>
+<div class="dropdown">
+    <button
+        type="button"
+        class="btn btn-secondary"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+        aria-label="Choose theme, currently {current.name}"
+        title="Theme: {current.name}"
+    >
+        <i class="bi bi-{current.icon}"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-{align}">
+        {#each modes as option (option.id)}
+            <li>
+                <button
+                    type="button"
+                    class="dropdown-item d-flex align-items-center"
+                    class:active={mode === option.id}
+                    aria-pressed={mode === option.id}
+                    onclick={() => select(option.id)}
+                >
+                    <i class="bi bi-{option.icon} me-2"></i>
+                    {option.name}
+                    {#if mode === option.id}<i class="bi bi-check2 ms-auto ps-3"></i>{/if}
+                </button>
+            </li>
+        {/each}
+    </ul>
+</div>
