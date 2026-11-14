@@ -59,3 +59,60 @@ describe('json', () => {
         expect(() => formatJson('{a:1}')).toThrow();
     });
 });
+
+import { binaryToText, csvToHtmlTable, jsonToCsv, jsonToProperties, propertiesToJson, removeStopwords, textToBinary, textToHtmlList, uniqueWords } from './converters.js';
+
+describe('json to csv', () => {
+    it('builds a union of columns and quotes cells', () => {
+        expect(jsonToCsv('[{"a":1,"b":"x,y"},{"a":2,"c":true}]')).toBe('a,b,c\n1,"x,y",\n2,,true');
+    });
+
+    it('rejects non-object rows', () => {
+        expect(() => jsonToCsv('[1,2]')).toThrow();
+    });
+});
+
+describe('html output', () => {
+    it('builds an escaped table', () => {
+        expect(csvToHtmlTable('a,b\n<1>,2')).toContain('<td>&lt;1&gt;</td>');
+    });
+
+    it('builds lists', () => {
+        expect(textToHtmlList('a\n\nb', { ordered: true })).toBe('<ol>\n  <li>a</li>\n  <li>b</li>\n</ol>');
+    });
+});
+
+describe('properties', () => {
+    it('round-trips nested data', () => {
+        const json = '{"app":{"name":"x y","tags":["a","b"]}}';
+        const props = jsonToProperties(json);
+        expect(props).toBe('app.name=x y\napp.tags[0]=a\napp.tags[1]=b');
+        expect(JSON.parse(propertiesToJson(props))).toEqual(JSON.parse(json));
+    });
+
+    it('skips comments and supports : separators and continuations', () => {
+        expect(JSON.parse(propertiesToJson('# c\n! c\na:1\nb = two \\\n  three'))).toEqual({ a: '1', b: 'two three' });
+    });
+});
+
+describe('binary', () => {
+    it('round-trips text', () => {
+        expect(textToBinary('Hi')).toBe('01001000 01101001');
+        expect(binaryToText(textToBinary('héy'))).toBe('héy');
+    });
+
+    it('rejects incomplete groups', () => {
+        expect(() => binaryToText('0101')).toThrow();
+    });
+});
+
+describe('words', () => {
+    it('removes stopwords and tidies spacing', () => {
+        expect(removeStopwords('The cat is on the mat, and it is happy.')).toBe('cat mat, happy.');
+    });
+
+    it('lists unique words', () => {
+        expect(uniqueWords('b A a B c')).toBe('b\na\nc');
+        expect(uniqueWords('b a', { sort: true })).toBe('a\nb');
+    });
+});
