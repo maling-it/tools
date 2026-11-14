@@ -16,6 +16,41 @@ export const categories = [
         icon: 'arrow-left-right'
     },
     {
+        id: 'security',
+        name: 'Security & Privacy',
+        sidebarName: 'Security & Privacy',
+        description: 'Password generators and hash calculators',
+        icon: 'shield-lock'
+    },
+    {
+        id: 'seo',
+        name: 'SEO Tools',
+        sidebarName: 'SEO',
+        description: 'Titles and meta tags for better search results',
+        icon: 'graph-up-arrow'
+    },
+    {
+        id: 'generator',
+        name: 'Code Generators',
+        sidebarName: 'Code Generators',
+        description: 'Generate code, codes, links and names',
+        icon: 'code-square'
+    },
+    {
+        id: 'calculator',
+        name: 'Calculators',
+        sidebarName: 'Calculators',
+        description: 'Handy calculators and counters',
+        icon: 'calculator'
+    },
+    {
+        id: 'games',
+        name: 'Games',
+        sidebarName: 'Play Games',
+        description: 'Quick games for a break',
+        icon: 'controller'
+    },
+    {
         id: 'testing',
         name: 'Testing Tools',
         sidebarName: 'Testing',
@@ -123,6 +158,382 @@ export const tools = [
         description: 'Validate, prettify or minify JSON with clear error messages',
         icon: 'braces-asterisk',
         features: ['Validate', 'Prettify', 'Minify']
+    },
+    {
+        category: 'string',
+        slug: 'remove-stopwords',
+        title: 'Remove Stopwords',
+        sidebarName: 'Remove Stopwords',
+        description: 'Strip common English filler words from your text',
+        icon: 'funnel'
+    },
+    {
+        category: 'converter',
+        slug: 'json-to-csv',
+        title: 'JSON to CSV',
+        sidebarName: 'JSON To CSV',
+        description: 'Convert a JSON array of objects into CSV',
+        icon: 'filetype-csv'
+    },
+    {
+        category: 'converter',
+        slug: 'csv-to-html-table',
+        title: 'CSV to HTML Table',
+        sidebarName: 'CSV To HTML Table',
+        description: 'Turn CSV data into a ready-to-paste HTML table',
+        icon: 'table'
+    },
+    {
+        category: 'converter',
+        slug: 'html-table-to-json',
+        title: 'HTML Table to JSON',
+        sidebarName: 'HTML Table To JSON',
+        description: 'Extract the data of HTML tables as JSON',
+        icon: 'table'
+    },
+    {
+        category: 'converter',
+        slug: 'html-to-text',
+        title: 'HTML to Text',
+        sidebarName: 'HTML To Text',
+        description: 'Strip HTML tags and get clean plain text',
+        icon: 'file-earmark-text'
+    },
+    {
+        category: 'converter',
+        slug: 'html-link-extractor',
+        title: 'HTML Link Extractor',
+        sidebarName: 'HTML Link Extractor',
+        description: 'Pull every link and its text out of HTML',
+        icon: 'link'
+    },
+    {
+        category: 'converter',
+        slug: 'create-html-link',
+        title: 'Create HTML Link',
+        sidebarName: 'Create HTML Link',
+        description: 'Build an HTML anchor tag with rel and target options',
+        icon: 'link-45deg'
+    },
+    {
+        category: 'converter',
+        slug: 'text-to-html-list',
+        title: 'Text to HTML List',
+        sidebarName: 'Text To HTML List',
+        description: 'Turn lines of text into an ordered or unordered HTML list',
+        icon: 'list-ul'
+    },
+    {
+        category: 'converter',
+        slug: 'xml-to-json',
+        title: 'XML to JSON',
+        sidebarName: 'XML To JSON',
+        description: 'Convert XML into JSON, keeping attributes',
+        icon: 'filetype-xml'
+    },
+    {
+        category: 'converter',
+        slug: 'json-to-property',
+        title: 'JSON to Properties',
+        sidebarName: 'JSON To Property',
+        description: 'Flatten JSON into Java-style .properties lines',
+        icon: 'file-earmark-code'
+    },
+    {
+        category: 'converter',
+        slug: 'property-to-json',
+        title: 'Properties to JSON',
+        sidebarName: 'Property to JSON',
+        description: 'Convert .properties files into nested JSON',
+        icon: 'file-earmark-code'
+    },
+    {
+        category: 'converter',
+        slug: 'image-to-base64',
+        title: 'Image to Base64',
+        sidebarName: 'Image To Base-64',
+        description: 'Encode an image as a Base64 data URI',
+        icon: 'image'
+    },
+    {
+        category: 'converter',
+        slug: 'heic-converter',
+        title: 'HEIC to JPG / PNG / GIF',
+        sidebarName: 'HEIC to JPG / PNG / GIF',
+        description: 'Convert HEIC photos into common image formats',
+        icon: 'images'
+    },
+    {
+        category: 'converter',
+        slug: 'heic-to-pdf',
+        title: 'HEIC to PDF',
+        sidebarName: 'HEIC to PDF',
+        description: 'Combine HEIC photos into a PDF',
+        icon: 'file-earmark-pdf'
+    },
+    {
+        category: 'converter',
+        slug: 'jpeg-to-pdf',
+        title: 'JPEG to PDF',
+        sidebarName: 'JPEG to PDF',
+        description: 'Combine JPEG images into a PDF',
+        icon: 'file-earmark-pdf'
+    },
+    {
+        category: 'converter',
+        slug: 'webp-to-pdf',
+        title: 'WEBP to PDF',
+        sidebarName: 'WEBP to PDF',
+        description: 'Combine WEBP images into a PDF',
+        icon: 'file-earmark-pdf'
+    },
+    {
+        category: 'converter',
+        slug: 'png-to-pdf',
+        title: 'PNG to PDF',
+        sidebarName: 'PNG to PDF',
+        description: 'Combine PNG images into a PDF',
+        icon: 'file-earmark-pdf'
+    },
+    {
+        category: 'converter',
+        slug: 'binary-translator',
+        title: 'Binary Translator',
+        sidebarName: 'Binary Translator',
+        description: 'Translate text to binary and back',
+        icon: 'cpu'
+    },
+    {
+        category: 'converter',
+        slug: 'unique-word-extractor',
+        title: 'Unique Word Extractor',
+        sidebarName: 'Unique Word Extractor',
+        description: 'List the distinct words used in a text',
+        icon: 'list-check'
+    },
+    {
+        category: 'converter',
+        slug: 'todo-list-maker',
+        title: 'To Do List Maker',
+        sidebarName: 'To Do List Maker',
+        description: 'Keep a simple to-do list saved in your browser',
+        icon: 'check2-square'
+    },
+    {
+        category: 'security',
+        slug: 'password-generator',
+        title: 'Password Generator',
+        sidebarName: 'Password Generator',
+        description: 'Generate random, strong passwords',
+        icon: 'key'
+    },
+    {
+        category: 'security',
+        slug: 'memorable-password',
+        title: 'Memorable Password',
+        sidebarName: 'Memorable Password',
+        description: 'Generate secure passwords that are easy to remember',
+        icon: 'chat-quote'
+    },
+    {
+        category: 'security',
+        slug: 'md5',
+        title: 'Calculate MD5',
+        sidebarName: 'Calculate MD5',
+        description: 'Compute MD5 and SHA hashes of text or files',
+        icon: 'fingerprint'
+    },
+    {
+        category: 'seo',
+        slug: 'title-maker',
+        title: 'Title Maker',
+        sidebarName: 'Title Maker',
+        description: 'Get page title ideas for any topic',
+        icon: 'type-h1'
+    },
+    {
+        category: 'seo',
+        slug: 'meta-tags',
+        title: 'Meta Tags Generator',
+        sidebarName: 'Meta Tags',
+        description: 'Generate SEO, Open Graph and Twitter meta tags',
+        icon: 'tags'
+    },
+    {
+        category: 'generator',
+        slug: 'css-button-generator',
+        title: 'CSS Button Generator',
+        sidebarName: 'CSS Button Generator',
+        description: 'Design a button and copy the CSS and HTML',
+        icon: 'square'
+    },
+    {
+        category: 'generator',
+        slug: 'qr-code-generator',
+        title: 'QR Code Generator',
+        sidebarName: 'QR Code Generator',
+        description: 'Create QR codes and download them as PNG or SVG',
+        icon: 'qr-code'
+    },
+    {
+        category: 'generator',
+        slug: 'barcode-generator',
+        title: 'Barcode Generator',
+        sidebarName: 'Bar Code Generator',
+        description: 'Create barcodes in popular formats',
+        icon: 'upc-scan'
+    },
+    {
+        category: 'generator',
+        slug: 'jquery-code-grabber',
+        title: 'jQuery Code Grabber',
+        sidebarName: 'jQuery Code Grabber',
+        description: 'Copy jQuery CDN tags and quick-start snippets',
+        icon: 'filetype-js'
+    },
+    {
+        category: 'generator',
+        slug: 'amazon-link-maker',
+        title: 'Amazon Link Maker',
+        sidebarName: 'Amazon Link Maker',
+        description: 'Build Amazon product links with your affiliate tag',
+        icon: 'link'
+    },
+    {
+        category: 'generator',
+        slug: 'audible-link-maker',
+        title: 'Audible Link Maker',
+        sidebarName: 'Audible Link Maker',
+        description: 'Build Audible links with your affiliate tag',
+        icon: 'headphones'
+    },
+    {
+        category: 'generator',
+        slug: 'amazon-feedback-maker',
+        title: 'Amazon Feedback Maker',
+        sidebarName: 'Amazon Feedback Maker',
+        description: 'Generate ready-made Amazon feedback text',
+        icon: 'chat-square-text'
+    },
+    {
+        category: 'generator',
+        slug: 'ebay-feedback-maker',
+        title: 'eBay Feedback Maker',
+        sidebarName: 'eBay Feedback Maker',
+        description: 'Generate ready-made eBay feedback text',
+        icon: 'chat-square-text'
+    },
+    {
+        category: 'generator',
+        slug: 'fiverr-feedback-maker',
+        title: 'Fiverr Feedback Maker',
+        sidebarName: 'Fiverr Feedback Maker',
+        description: 'Generate ready-made Fiverr feedback text',
+        icon: 'chat-square-text'
+    },
+    {
+        category: 'generator',
+        slug: 'team-name-generator',
+        title: 'Cool Team Name Generator',
+        sidebarName: 'Cool Team Name Generator',
+        description: 'Get cool team name ideas',
+        icon: 'people'
+    },
+    {
+        category: 'generator',
+        slug: 'business-name-generator',
+        title: 'Shopify Business Name Generator',
+        sidebarName: 'Shopify Business Name Generator',
+        description: 'Get store name ideas from a keyword',
+        icon: 'shop'
+    },
+    {
+        category: 'calculator',
+        slug: 'crypto-avg-calculator',
+        title: 'Crypto Average Calculator',
+        sidebarName: 'Crypto Avg Calculator',
+        description: 'Find your average buy price across purchases',
+        icon: 'currency-bitcoin'
+    },
+    {
+        category: 'calculator',
+        slug: 'csv-crypto-avg-calculator',
+        title: 'CSV Crypto Average Calculator',
+        sidebarName: 'CSV Crypto Avg Calculator',
+        description: 'Paste many purchases and get your average cost',
+        icon: 'currency-bitcoin'
+    },
+    {
+        category: 'calculator',
+        slug: 'work-hour-calculator',
+        title: 'Work Hour Calculator',
+        sidebarName: 'Work Hour Calculator',
+        description: 'Total your daily and weekly work hours',
+        icon: 'clock-history'
+    },
+    {
+        category: 'calculator',
+        slug: 'concrete-calculator',
+        title: 'Concrete Calculator',
+        sidebarName: 'Concrete Calculator',
+        description: 'Estimate the concrete and bags you need',
+        icon: 'bricks'
+    },
+    {
+        category: 'calculator',
+        slug: 'dirt-calculator',
+        title: 'Dirt Calculator',
+        sidebarName: 'Dirt Calculator',
+        description: 'Estimate the cubic yards of dirt you need',
+        icon: 'layers'
+    },
+    {
+        category: 'calculator',
+        slug: 'easy-counter',
+        title: 'Easy Counter',
+        sidebarName: 'Easy Counter',
+        description: 'A simple counter with add, subtract and reset',
+        icon: 'plus-slash-minus'
+    },
+    {
+        category: 'calculator',
+        slug: 'click-counter',
+        title: 'Click Counter',
+        sidebarName: 'Click Counter',
+        description: 'Count clicks and measure clicks per second',
+        icon: 'hand-index'
+    },
+    {
+        category: 'calculator',
+        slug: 'cap-rate-calculator',
+        title: 'Cap Rate Calculator',
+        sidebarName: 'Cap Rate Calculator',
+        description: 'Calculate the capitalization rate of a property',
+        icon: 'house-door'
+    },
+    {
+        category: 'games',
+        slug: 'wordle',
+        title: 'Wordle',
+        sidebarName: 'Wordle',
+        description: 'Guess the five-letter word in six tries',
+        icon: 'grid-3x3-gap'
+    },
+    {
+        category: 'games',
+        slug: 'tic-tac-toe',
+        title: 'Tic Tac Toe',
+        sidebarName: 'TicTacToe',
+        description: 'Play tic-tac-toe against the computer',
+        icon: 'x-lg'
+    },
+    {
+        category: 'games',
+        slug: 'memory-match',
+        title: 'Memory Match',
+        sidebarName: 'MemoryMatch',
+        description: 'Flip cards to find the matching pairs',
+        icon: 'columns-gap'
     },
     {
         category: 'testing',

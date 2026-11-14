@@ -20,7 +20,7 @@
             </div>
             <p class="card-text text-body-secondary small mb-3">{tool.description}</p>
             <div>
-                {#each tool.features as feature (feature)}
+                {#each (tool.features ?? []) as feature (feature)}
                     <span class="badge bg-body-secondary text-body-secondary fw-normal me-1 mb-1">{feature}</span>
                 {/each}
             </div>
