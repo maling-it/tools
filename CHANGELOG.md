@@ -6,6 +6,7 @@ All notable changes to Mools are documented here. The format follows [Keep a Cha
 
 ### Added
 - MIT license, plus repository metadata (description, homepage, bugs and license) in `package.json`.
+- A public roadmap: a project board, version milestones (1.2.0, 1.3.0, 2.0.0) and ten tracked issues. New issues from the issue forms are added to the board automatically.
 - A `Release` workflow that publishes a GitHub release when a version tag is pushed, and signed release tags.
 
 ## [1.1.0] - 2026-11-15

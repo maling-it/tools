@@ -2,6 +2,7 @@ name: Feedback or question
 description: Ask a question or share an idea about the site, the agent features or the MCP server
 title: "Feedback: "
 labels: ["question"]
+projects: ["maling-it/3"]
 body:
   - type: input
     id: tool

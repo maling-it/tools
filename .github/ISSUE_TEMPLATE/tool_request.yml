@@ -2,6 +2,7 @@ name: Tool request
 description: Suggest a new tool or an improvement to an existing one
 title: "Tool request: "
 labels: ["enhancement"]
+projects: ["maling-it/3"]
 body:
   - type: markdown
     attributes:

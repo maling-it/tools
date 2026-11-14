@@ -111,6 +111,10 @@ Mools is built to be used by AI agents as well as people:
 
 To add a prompt, add it to `src/lib/prompts.js`; the website and the MCP server both pick it up.
 
+## Roadmap
+
+What is planned is tracked on the [project board](https://github.com/orgs/maling-it/projects/3) and explained on the [Roadmap wiki page](https://github.com/maling-it/tools/wiki/Roadmap). Work is grouped by version milestone ([1.2.0](https://github.com/maling-it/tools/milestone/1), [1.3.0](https://github.com/maling-it/tools/milestone/2), [2.0.0](https://github.com/maling-it/tools/milestone/3)) instead of dates. Ideas are welcome: open a [tool request](https://github.com/maling-it/tools/issues/new?template=tool_request.yml).
+
 ## Releasing
 
 Versions follow [Semantic Versioning](https://semver.org/) and every release is listed in [`CHANGELOG.md`](CHANGELOG.md).
