@@ -28,6 +28,7 @@
 ## Why Mools
 
 - **Private by design.** Every tool runs in your browser. Your input is never uploaded, there are no accounts and no backend.
+- **Works offline.** After the first visit every page is saved in your browser (about 8 MB), and Mools can be installed as an app from your browser menu.
 - **Fast to reach.** Press <kbd>Ctrl</kbd> + <kbd>K</kbd> anywhere to search all tools, or use the sidebar and the home page search.
 - **Pleasant to use.** Light, dark and automatic themes, three Halfmoon styles, a layout that works on phones and a copy button wherever there is output.
 - **Built for AI agents too.** Every tool is also exposed through `llms.txt`, `tools.json`, WebMCP and an MCP server.

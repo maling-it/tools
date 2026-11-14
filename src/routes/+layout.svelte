@@ -12,6 +12,7 @@
     import Sidebar from "../components/Sidebar.svelte";
     import Footer from "../components/Footer.svelte";
     import CommandPalette from "../components/CommandPalette.svelte";
+    import AppStatus from "../components/AppStatus.svelte";
     import ToolCard from "../components/ToolCard.svelte";
     import FavoriteButton from "../components/FavoriteButton.svelte";
     import { favorites } from "#lib/favorites.svelte.js";
@@ -110,6 +111,7 @@
 <Sidebar />
 <Navbar onsearch={() => palette?.show()} />
 <CommandPalette bind:this={palette} />
+<AppStatus />
 <div class="container-md px-3 py-4 px-sm-4 px-xl-5" id="top">
     {#if tool}
         <div class="float-end ms-2 mt-1">

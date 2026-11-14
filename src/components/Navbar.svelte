@@ -49,8 +49,8 @@
             } catch {
                 // Storage can be unavailable; the next page load simply fetches again.
             }
-        } catch (error) {
-            console.error("Error fetching data:", error);
+        } catch {
+            // Offline or blocked: the star count is optional, so just leave it out.
         }
     });
 </script>
