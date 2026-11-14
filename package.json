@@ -36,5 +36,8 @@
   },
   "bin": {
     "mools-mcp": "./mcp/server.js"
+  },
+  "engines": {
+    "node": ">=22.17"
   }
 }

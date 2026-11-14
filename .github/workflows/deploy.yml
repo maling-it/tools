@@ -23,17 +23,21 @@ concurrency:
 jobs:
   # Single deploy job since we're just deploying
   build_site:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      # SvelteKit 3 needs Node >= 22.17; the vite CLI runs on Node even when invoked through bun.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
       - name: Install dependencies
         run: bun install --frozen-lockfile
+      - name: Test
+        run: bun run test
       - name: Build
         run: |
           bun run build
