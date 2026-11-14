@@ -14,7 +14,7 @@
 
     const faq = [
         ["Is my data sent anywhere?", "No. Tools run in your browser and your input is never uploaded. The only network request the site makes by itself is a small call to GitHub for the star count."],
-        ["Can I use Mools offline?", "Not yet. After a page has loaded its tool keeps working without a connection, but the site is not installable as an offline app."],
+        ["Can I use Mools offline?", "Yes. After your first visit Mools saves itself in your browser (about 8 MB), so every page and tool opens without a connection, and you can install it as an app from your browser menu. Only the Telegram tester and the star count need the internet."],
         ["Can my AI agent use these tools?", "Yes. Mools publishes llms.txt and tools.json, registers its tools with WebMCP in supporting browsers and ships an MCP server. See the README for setup."],
         ["How do I get a reply?", "Issues are public on GitHub, so replies happen there. Please include the tool name and the steps to reproduce a problem."]
     ];

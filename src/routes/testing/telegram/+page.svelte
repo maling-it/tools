@@ -44,6 +44,10 @@
     const send = async () => {
         error = "";
         response = "";
+        if (!navigator.onLine) {
+            error = "You are offline. The Telegram tester needs an internet connection to reach api.telegram.org.";
+            return;
+        }
         if (missing) {
             error = missing;
             return;

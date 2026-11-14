@@ -6,6 +6,7 @@ All notable changes to Mools are documented here. The format follows [Keep a Cha
 
 ### Added
 - MIT license, plus repository metadata (description, homepage, bugs and license) in `package.json`.
+- Offline support: Mools can be installed as an app and works without a connection after the first visit (a web app manifest, icons and a service worker). A banner explains when you are offline, and another offers a reload when a new version is ready.
 - Favorites: a star button on every tool page. Favorites appear at the top of the sidebar, on the home page and first in the command palette, and are kept in the browser.
 - Browser tests (Playwright) that open every page and exercise the main tools. They run in a new `CI` workflow on pull requests and block the deploy when a page breaks.
 - A public roadmap: a project board, version milestones (1.2.0, 1.3.0, 2.0.0) and ten tracked issues. New issues from the issue forms are added to the board automatically.
