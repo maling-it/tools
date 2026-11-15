@@ -4,6 +4,9 @@ All notable changes to Mools are documented here. The format follows [Keep a Cha
 
 ## [Unreleased]
 
+### Added
+- The release workflow regenerates the wiki's Tool Catalog and the counts on its Home page from `src/lib/tools.js` (`scripts/wiki-catalog.mjs`). ([#10](https://github.com/maling-it/tools/issues/10))
+
 ## [1.3.0] - 2026-11-15
 
 Mools is now accessible (WCAG 2.1 AA), friendlier to agents, safer with regular expressions and watches its own size.
