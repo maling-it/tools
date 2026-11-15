@@ -13,7 +13,9 @@
     let query = $state("");
     let searchInput = $state();
     // Ids of expanded groups; every group is open while searching.
-    let openGroups = $state(["start"]);
+    // The group of the page being viewed starts open, also in the prerendered HTML, so the list does not jump after hydration.
+    const startCategory = tools.find((t) => page.url.pathname === `${base}${t.path}/`)?.category;
+    let openGroups = $state(startCategory ? ["start", startCategory] : ["start"]);
     let loaded = false;
 
     onMount(() => {

@@ -33,6 +33,8 @@ jobs:
         run: bun run build
       - name: Check bundle budgets
         run: bun run budget
+      - name: Lighthouse
+        run: bunx lhci autorun
       # The browser tests use the Google Chrome that is preinstalled on GitHub's runners.
       - name: Browser tests
         run: bun run test:e2e

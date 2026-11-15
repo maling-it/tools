@@ -5,7 +5,11 @@ All notable changes to Mools are documented here. The format follows [Keep a Cha
 ## [Unreleased]
 
 ### Added
+- **Lighthouse in CI.** The home page and two tool pages are measured on every pull request, with budgets for performance, accessibility, largest contentful paint, layout shift and blocking time (`lighthouserc.json`). ([#8](https://github.com/maling-it/tools/issues/8))
 - The release workflow regenerates the wiki's Tool Catalog and the counts on its Home page from `src/lib/tools.js` (`scripts/wiki-catalog.mjs`). ([#10](https://github.com/maling-it/tools/issues/10))
+
+### Fixed
+- The sidebar no longer jumps when a tool page loads: the group of the current page is open in the prerendered HTML, which lowers layout shift on tool pages from 0.072 to 0.003.
 
 ## [1.3.0] - 2026-11-15
 
