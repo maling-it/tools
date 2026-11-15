@@ -19,6 +19,7 @@
     "check": "svelte-kit sync",
     "test": "vitest run",
     "mcp": "node mcp/server.js",
+    "budget": "node scripts/bundle-budget.mjs",
     "test:e2e": "playwright test"
   },
   "devDependencies": {
