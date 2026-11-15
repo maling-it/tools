@@ -149,11 +149,11 @@ export const tools = [
     {
         category: 'converter',
         slug: 'before-eyd',
-        title: 'Van Ophuijsen Indonesian',
-        sidebarName: 'Van Ophuijsen Indonesian',
-        description: 'Convert modern Indonesian spelling into the Van Ophuijsen spelling',
+        title: 'Old Indonesian Spelling Converter',
+        sidebarName: 'Old Indonesian Spelling',
+        description: 'Convert Indonesian between modern spelling and the Van Ophuijsen (1901) or Republican (1947) spelling, both ways',
         icon: 'translate',
-        features: ['Live Conversion', 'Keeps Casing']
+        features: ['Both Directions', 'Two Old Spellings', 'Keeps Casing', 'Keep List']
     },
     {
         category: 'converter',

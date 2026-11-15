@@ -132,3 +132,17 @@ test('invalid input is explained in the Base64, URL and SQL tools', async ({ pag
 	await page.fill('#main-textarea', 'select (');
 	await expect(page.getByRole('alert')).toContainText('Could not format the SQL');
 });
+
+test('Old Indonesian Spelling Converter works both ways and keeps capitals, addresses and kept words', async ({ page }) => {
+	await page.goto('/tools/converter/before-eyd/');
+	const output = page.locator('.card pre').first();
+	await page.fill('#main-textarea', 'JAKARTA yang jauh, Google cukup. https://x.id/cuku');
+	await expect(output).toContainText('DJAKARTA jang djaoeh, Google tjoekoep. https://x.id/cuku');
+	await page.fill('#spelling-keep', 'google, cukup');
+	await expect(output).toContainText('DJAKARTA jang djaoeh, Google cukup.');
+	await page.selectOption('#spelling-system', 'republican');
+	await expect(output).toContainText('jang djauh');
+	await page.selectOption('#spelling-direction', 'to-modern');
+	await page.fill('#main-textarea', 'Djakarta Tjitjalengka Jang djauh');
+	await expect(output).toContainText('Jakarta Cicalengka Yang jauh');
+});

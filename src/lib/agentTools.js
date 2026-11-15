@@ -1,7 +1,7 @@
 // Machine-callable versions of the tools, shared by the WebMCP registration in the browser
 // and the stdio MCP server in /mcp. Every tool has a JSON Schema and returns text.
 // Tools marked `dom` need DOMParser: native in browsers, provided by jsdom in the MCP server.
-import { base64Decode, base64Encode, binaryToText, csvToHtmlTable, csvToJson, formatJson, jsonToCsv, jsonToProperties, minifyJson, propertiesToJson, removeStopwords, textToBinary, textToHtmlList, toVanOphuijsen, uniqueWords } from './converters.js';
+import { base64Decode, base64Encode, binaryToText, csvToHtmlTable, csvToJson, formatJson, jsonToCsv, jsonToProperties, minifyJson, propertiesToJson, removeStopwords, textToBinary, textToHtmlList, SPELLING_SYSTEMS, convertSpelling, uniqueWords } from './converters.js';
 import { averageCost, capRate, concrete, dirt, formatMinutes, workMinutes } from './calculators.js';
 import { buildAffiliateLink, buildHtmlLink, buildMetaTags, generatePassword, makeTitles, md5, memorablePassword, shaHash } from './generators.js';
 import { extractLinks, htmlTablesToJson, htmlToText, xmlToJson } from './htmlTools.js';
@@ -158,9 +158,9 @@ export const agentTools = [
     },
     {
         name: 'van_ophuijsen_spelling',
-        description: 'Convert modern Indonesian spelling to the Van Ophuijsen spelling (j to dj, y to j, u to oe, ...).',
-        inputSchema: object({ text: string('Modern Indonesian text') }),
-        run: ({ text }) => toVanOphuijsen(text)
+        description: 'Convert Indonesian text between modern spelling and an old spelling, in either direction. Van Ophuijsen (1901 to 1947): j to dj, y to j, c to tj, u to oe, ny to nj, sy to sj, kh to ch. Republican (1947 to 1972): the same without u to oe. Web and email addresses are never changed.',
+        inputSchema: object({ text: string('Indonesian text'), system: string('"van-ophuijsen" (default) or "republican"', { enum: Object.keys(SPELLING_SYSTEMS) }), direction: string('"to-old" (default) or "to-modern"', { enum: ['to-old', 'to-modern'] }), keep: string('Words to leave as they are, separated by spaces or commas') }, ['text']),
+        run: ({ text, ...options }) => convertSpelling(text, options)
     },
     {
         name: 'html_to_text',

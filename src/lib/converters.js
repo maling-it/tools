@@ -57,15 +57,49 @@ export const csvToJson = (text, { delimiter = ',', header = true } = {}) => {
     );
 };
 
-// Van Ophuijsen spelling (pre-1947) from modern Indonesian spelling, converted in a single pass.
-const VAN_OPHUIJSEN = { ny: 'nj', sy: 'sj', kh: 'ch', j: 'dj', y: 'j', c: 'tj', u: 'oe' };
+// Old Indonesian spellings. Modern letters on the left, the old spelling on the right.
+// Van Ophuijsen (1901 to 1947) also wrote u as oe; the Republican (Soewandi) spelling of 1947 to 1972 already used u.
+const OLD_SPELLING_PAIRS = [['ny', 'nj'], ['sy', 'sj'], ['kh', 'ch'], ['j', 'dj'], ['y', 'j'], ['c', 'tj']];
+export const SPELLING_SYSTEMS = {
+    'van-ophuijsen': { name: 'Van Ophuijsen (1901 to 1947)', pairs: [...OLD_SPELLING_PAIRS, ['u', 'oe']] },
+    republican: { name: 'Republican / Soewandi (1947 to 1972)', pairs: OLD_SPELLING_PAIRS }
+};
 
-export const toVanOphuijsen = (text) =>
-    text.replace(/ny|sy|kh|j|y|c|u/gi, (match) => {
-        const converted = VAN_OPHUIJSEN[match.toLowerCase()];
-        if (match.length > 1 && match === match.toUpperCase()) return converted.toUpperCase();
-        return match[0] === match[0].toUpperCase() ? converted[0].toUpperCase() + converted.slice(1) : converted;
-    });
+// Text that must never be converted: web addresses and email addresses.
+const PROTECTED = /(https?:\/\/\S+|www\.\S+|[\w.+-]+@[\w-]+(?:\.[\w-]+)+)/giu;
+
+/**
+ * Converts Indonesian text between modern spelling and an older one, in a single pass, word by word.
+ * system: "van-ophuijsen" or "republican". direction: "to-old" (default) or "to-modern".
+ * keep: words (separated by spaces or commas) that stay as they are. Web and email addresses are never changed.
+ * Casing is kept: Jakarta becomes Djakarta and JAKARTA becomes DJAKARTA.
+ */
+export const convertSpelling = (text, { system = 'van-ophuijsen', direction = 'to-old', keep = '' } = {}) => {
+    const spelling = SPELLING_SYSTEMS[system];
+    if (!spelling) throw new Error(`Unknown spelling "${system}". Use one of: ${Object.keys(SPELLING_SYSTEMS).join(', ')}.`);
+    if (!['to-old', 'to-modern'].includes(direction)) throw new Error('The direction must be "to-old" or "to-modern".');
+    const map = new Map(spelling.pairs.map(([modern, old]) => (direction === 'to-old' ? [modern, old] : [old, modern])));
+    // Longest pieces first, so ny is read before y and dj before j.
+    const pieces = new RegExp([...map.keys()].sort((a, b) => b.length - a.length).join('|'), 'giu');
+    const kept = new Set(String(keep).toLowerCase().split(/[\s,;]+/).filter(Boolean));
+
+    const convertWord = (word) => {
+        if (kept.has(word.toLowerCase())) return word;
+        const allCaps = word.length > 1 && word === word.toUpperCase();
+        return word.replace(pieces, (match) => {
+            const converted = map.get(match.toLowerCase());
+            if (allCaps) return converted.toUpperCase();
+            return match[0] !== match[0].toLowerCase() ? converted[0].toUpperCase() + converted.slice(1) : converted;
+        });
+    };
+    return text
+        .split(PROTECTED)
+        .map((part, index) => (index % 2 === 1 ? part : part.replace(/\p{L}+/gu, convertWord)))
+        .join('');
+};
+
+/** Modern spelling to Van Ophuijsen spelling. */
+export const toVanOphuijsen = (text) => convertSpelling(text);
 
 // Base64 that is safe for non-ASCII text
 export const base64Encode = (text, { urlSafe = false } = {}) => {

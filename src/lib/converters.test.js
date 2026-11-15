@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { base64Decode, base64Encode, csvToJson, formatJson, minifyJson, parseCsv, toVanOphuijsen } from './converters.js';
+import { base64Decode, base64Encode, convertSpelling, csvToJson, formatJson, minifyJson, parseCsv, toVanOphuijsen } from './converters.js';
 
 describe('csv', () => {
     it('handles quotes, embedded delimiters and newlines', () => {
@@ -30,6 +30,45 @@ describe('van ophuijsen', () => {
     it('converts letters in one pass and keeps casing', () => {
         expect(toVanOphuijsen('Yang jauh itu cukup')).toBe('Jang djaoeh itoe tjoekoep');
         expect(toVanOphuijsen('Nyonya Syarif Khusus')).toBe('Njonja Sjarif Choesoes');
+    });
+});
+
+describe('convertSpelling', () => {
+    it('keeps ALL CAPS words in capitals', () => {
+        expect(convertSpelling('JAKARTA')).toBe('DJAKARTA');
+        expect(convertSpelling('UNDANG-UNDANG DASAR')).toBe('OENDANG-OENDANG DASAR');
+        expect(convertSpelling('Jakarta, JAKARTA, jakarta')).toBe('Djakarta, DJAKARTA, djakarta');
+    });
+    it('reads two letter pieces before one letter pieces', () => {
+        expect(convertSpelling('nyanyi banyak syukur akhir')).toBe('njanji banjak sjoekoer achir');
+        expect(convertSpelling('ayah')).toBe('ajah');
+    });
+    it('can use the Republican spelling, which already writes u', () => {
+        expect(convertSpelling('Yang jauh itu cukup', { system: 'republican' })).toBe('Jang djauh itu tjukup');
+    });
+    it('converts back to modern spelling', () => {
+        expect(convertSpelling('Djakarta, Soerabaja, Soekarno, tjoekoep, njanji, sjarat, achir', { direction: 'to-modern' })).toBe('Jakarta, Surabaya, Sukarno, cukup, nyanyi, syarat, akhir');
+        expect(convertSpelling('DJAKARTA Tjitjalengka', { direction: 'to-modern' })).toBe('JAKARTA Cicalengka');
+        expect(convertSpelling('Jang djauh', { system: 'republican', direction: 'to-modern' })).toBe('Yang jauh');
+    });
+    it('round-trips modern text', () => {
+        const text = 'Nyonya Yanti membeli cucur dan sayur di Juanda, khusus untuk acara yang jauh.';
+        for (const system of ['van-ophuijsen', 'republican']) {
+            expect(convertSpelling(convertSpelling(text, { system }), { system, direction: 'to-modern' })).toBe(text);
+        }
+    });
+    it('leaves web addresses and email addresses alone', () => {
+        expect(convertSpelling('Lihat https://example.com/cuku?u=1 dan jaya@yahoo.com atau www.cuci.id juga')).toBe('Lihat https://example.com/cuku?u=1 dan jaya@yahoo.com ataoe www.cuci.id djoega');
+    });
+    it('keeps the words you name', () => {
+        expect(convertSpelling('Google Jakarta cukup', { keep: 'google, cukup' })).toBe('Google Djakarta cukup');
+    });
+    it('keeps numbers, punctuation and line breaks', () => {
+        expect(convertSpelling('Ya!\n12 jam, 3 hari.')).toBe('Ja!\n12 djam, 3 hari.');
+    });
+    it('explains a wrong option', () => {
+        expect(() => convertSpelling('a', { system: 'x' })).toThrow(/Unknown spelling "x"/);
+        expect(() => convertSpelling('a', { direction: 'x' })).toThrow(/to-old/);
     });
 });
 
