@@ -1,6 +1,7 @@
 <script>
     import ToolPage from "./ToolPage.svelte";
     import OutputCard from "./OutputCard.svelte";
+    import { announce } from "#lib/announce.svelte.js";
 
     /**
      * Input textarea with a live converted output. `convert(text)` may throw; its message is
@@ -28,6 +29,17 @@
         } catch (e) {
             return { text: "", error: e.message };
         }
+    });
+
+    // Let screen reader users know that the output changed, once typing pauses.
+    $effect(() => {
+        const output = result.text;
+        const timer = setTimeout(() => {
+            if (value.trim() === "") return;
+            if (output === "") return; // errors are announced by their own alert
+            announce(`Result updated, ${output.split("\n").length} ${output.split("\n").length === 1 ? "line" : "lines"}`);
+        }, 900);
+        return () => clearTimeout(timer);
     });
 </script>
 

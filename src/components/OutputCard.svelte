@@ -1,5 +1,6 @@
 <script>
     import { copyToClipboard } from '#lib/textUtils.js';
+    import { announce } from '#lib/announce.svelte.js';
 
     let { title = 'Output', text = '', filename = '', mime = 'text/plain' } = $props();
 
@@ -7,6 +8,7 @@
 
     const copy = async () => {
         if (await copyToClipboard(text)) {
+            announce(`${title} copied to clipboard`);
             copied = true;
             setTimeout(() => (copied = false), 1500);
         }

@@ -544,3 +544,54 @@
 [data-bs-core=elegant] .demo-sidebar-container {
     background-color: var(--bs-tertiary-bg);
 }
+
+/* Accessibility */
+
+/* A clear keyboard focus indicator for everything that can be focused, in every theme and style.
+   Halfmoon and Bootstrap remove the outline on several components, so this one is !important. */
+:focus-visible {
+    outline: 3px solid var(--bs-primary) !important;
+    outline-offset: 2px !important;
+}
+
+/* "Skip to main content": hidden until it receives focus, then shown above everything else. */
+.skip-link:focus,
+.skip-link:focus-visible {
+    position: fixed;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 2100;
+    padding: 0.5rem 1rem;
+    border-radius: var(--bs-border-radius);
+    background: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    border: 2px solid var(--bs-primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* The main region is focused by the skip link; it does not need a visible outline of its own. */
+main:focus,
+main:focus-visible {
+    outline: none !important;
+}
+
+/* Slightly stronger secondary text and inline code in dark mode, so they keep 4.5:1 contrast on every surface and style. */
+:root[data-bs-theme="dark"],
+:root[data-bs-core][data-bs-theme="dark"] {
+    --bs-secondary-color: rgba(var(--bs-body-color-rgb), 0.9);
+    --bs-code-color: #ffa8d2;
+}
+
+/* Respect the "reduce motion" setting: no animations, transitions or smooth scrolling. */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        transition-delay: 0s !important;
+        scroll-behavior: auto !important;
+    }
+}

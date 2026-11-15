@@ -42,7 +42,7 @@
                 <li><a class="link-secondary text-decoration-none" href="{REPO_URL}/blob/master/.github/ACCESSIBILITY.md" rel="noreferrer">Accessibility</a></li>
                 <li><a class="link-secondary text-decoration-none" href="{REPO_URL}/blob/master/.github/SECURITY.md" rel="noreferrer">Security</a></li>
                 <li><a class="link-secondary text-decoration-none" href="{REPO_URL}/blob/master/.github/CODE_OF_CONDUCT.md" rel="noreferrer">Code of conduct</a></li>
-                <li><a class="link-secondary text-decoration-none" href="#top" onclick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}>Back to top <i class="bi bi-arrow-up"></i></a></li>
+                <li><a class="link-secondary text-decoration-none" href="#top" onclick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); }}>Back to top <i class="bi bi-arrow-up"></i></a></li>
             </ul>
         </div>
     </div>

@@ -1,5 +1,6 @@
 <script>
     import { copyToClipboard } from '#lib/textUtils.js';
+    import { announce } from '#lib/announce.svelte.js';
 
     /**
      * Shared layout for text tools.
@@ -39,6 +40,7 @@
 
     const copy = async () => {
         if (await copyToClipboard(value)) {
+            announce('Copied to clipboard');
             copied = true;
             setTimeout(() => (copied = false), 1500);
         }

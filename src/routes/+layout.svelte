@@ -108,11 +108,13 @@
     {/if}
 </svelte:head>
 
+<a class="skip-link visually-hidden-focusable" href="#main">Skip to main content</a>
 <Sidebar />
 <Navbar onsearch={() => palette?.show()} />
 <CommandPalette bind:this={palette} />
 <AppStatus />
 <div class="container-md px-3 py-4 px-sm-4 px-xl-5" id="top">
+    <main id="main" tabindex="-1">
     {#if tool}
         <div class="float-end ms-2 mt-1">
             <FavoriteButton path={tool.path} />
@@ -132,6 +134,7 @@
             </div>
         </section>
     {/if}
+    </main>
 
     <Footer />
 </div>

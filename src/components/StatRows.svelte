@@ -1,5 +1,6 @@
 <script>
     import { copyToClipboard } from "#lib/textUtils.js";
+    import { announce } from "#lib/announce.svelte.js";
 
     // rows: [label, value] pairs. With `copyable`, each value gets a copy button.
     let { rows = [], title = "Results", copyable = false } = $props();
@@ -8,6 +9,7 @@
 
     const copy = async (name, value) => {
         if (await copyToClipboard(String(value))) {
+            announce(`${name} copied to clipboard`);
             copied = name;
             setTimeout(() => (copied = ""), 1200);
         }
