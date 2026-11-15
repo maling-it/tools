@@ -1077,6 +1077,33 @@ export const tools = [
         description: 'Generate random MAC addresses and convert them between notations',
         icon: 'ethernet',
         features: ['Random Addresses', 'Four Notations', 'Unicast and Multicast']
+    },
+    {
+        category: 'converter',
+        slug: 'pdf-merge',
+        title: 'PDF Merge',
+        sidebarName: 'PDF Merge',
+        description: 'Join several PDF files into one, in the order you choose',
+        icon: 'files',
+        features: ['Reorder Files', 'Any Page Count', 'Offline']
+    },
+    {
+        category: 'converter',
+        slug: 'pdf-split',
+        title: 'PDF Split',
+        sidebarName: 'PDF Split',
+        description: 'Keep some pages of a PDF or split it into several files',
+        icon: 'scissors',
+        features: ['Page Ranges', 'One File Per Page', 'ZIP Download']
+    },
+    {
+        category: 'generator',
+        slug: 'favicon-generator',
+        title: 'Favicon Generator',
+        sidebarName: 'Favicon',
+        description: 'Make favicon.ico, PNG icons, a manifest and head HTML from one image',
+        icon: 'app-indicator',
+        features: ['favicon.ico', 'Apple Touch Icon', 'Web Manifest']
     }
 ].map((tool) => ({ ...tool, path: `/${tool.category}/${tool.slug}` }));
 

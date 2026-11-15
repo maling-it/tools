@@ -5,7 +5,7 @@
 <h1 align="center">Mools</h1>
 
 <p align="center">
-  <strong>123 free developer tools that run in your browser.</strong><br />
+  <strong>126 free developer tools that run in your browser.</strong><br />
   Text, converters, bulk tools, security, SEO, generators, calculators, games and helpers for coding with AI.
 </p>
 
