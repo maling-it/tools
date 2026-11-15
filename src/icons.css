@@ -1,0 +1,201 @@
+/*!
+ * Bootstrap Icons v1.13.2 (https://icons.getbootstrap.com/)
+ * Copyright 2019-2024 The Bootstrap Authors
+ * Licensed under MIT (https://github.com/twbs/icons/blob/main/LICENSE)
+ */
+
+@font-face {
+  font-display: block;
+  font-family: "bootstrap-icons";
+  src: url("../node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2?e34853135f9e39acf64315236852cd5a") format("woff2"),
+url("../node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff?e34853135f9e39acf64315236852cd5a") format("woff");
+}
+
+.bi::before,
+[class^="bi-"]::before,
+[class*=" bi-"]::before {
+  display: inline-block;
+  font-family: bootstrap-icons !important;
+  font-style: normal;
+  font-weight: normal !important;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  vertical-align: -.125em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.bi-123::before { content: "\f67f"; }
+.bi-app::before { content: "\f10b"; }
+.bi-arrow-down::before { content: "\f128"; }
+.bi-arrow-left-right::before { content: "\f12b"; }
+.bi-arrow-right::before { content: "\f138"; }
+.bi-arrow-up::before { content: "\f148"; }
+.bi-back::before { content: "\f155"; }
+.bi-backspace::before { content: "\f159"; }
+.bi-box-arrow-up-right::before { content: "\f1c5"; }
+.bi-box-arrow-up::before { content: "\f1c6"; }
+.bi-box-seam::before { content: "\f1c7"; }
+.bi-box::before { content: "\f1c8"; }
+.bi-braces::before { content: "\f1c9"; }
+.bi-bricks::before { content: "\f1ca"; }
+.bi-broadcast::before { content: "\f1d6"; }
+.bi-brush::before { content: "\f1d8"; }
+.bi-bug::before { content: "\f1dc"; }
+.bi-bullseye::before { content: "\f1de"; }
+.bi-calculator::before { content: "\f1e0"; }
+.bi-calendar-event::before { content: "\f1e8"; }
+.bi-chat-dots::before { content: "\f24a"; }
+.bi-chat-quote::before { content: "\f255"; }
+.bi-chat-square-text::before { content: "\f264"; }
+.bi-check::before { content: "\f26e"; }
+.bi-check2-square::before { content: "\f271"; }
+.bi-check2::before { content: "\f272"; }
+.bi-chevron-down::before { content: "\f282"; }
+.bi-chevron-up::before { content: "\f286"; }
+.bi-circle-half::before { content: "\f288"; }
+.bi-clipboard::before { content: "\f290"; }
+.bi-clock-history::before { content: "\f292"; }
+.bi-clock::before { content: "\f293"; }
+.bi-code-slash::before { content: "\f2c6"; }
+.bi-code-square::before { content: "\f2c7"; }
+.bi-code::before { content: "\f2c8"; }
+.bi-collection::before { content: "\f2cc"; }
+.bi-columns-gap::before { content: "\f2cd"; }
+.bi-command::before { content: "\f2cf"; }
+.bi-controller::before { content: "\f2d4"; }
+.bi-cpu::before { content: "\f2d6"; }
+.bi-cursor::before { content: "\f2e3"; }
+.bi-dash::before { content: "\f2ea"; }
+.bi-diagram-3::before { content: "\f2ee"; }
+.bi-display::before { content: "\f302"; }
+.bi-distribute-vertical::before { content: "\f304"; }
+.bi-dot::before { content: "\f309"; }
+.bi-download::before { content: "\f30a"; }
+.bi-emoji-smile::before { content: "\f327"; }
+.bi-envelope::before { content: "\f32f"; }
+.bi-eye-slash::before { content: "\f340"; }
+.bi-eye::before { content: "\f341"; }
+.bi-file-diff::before { content: "\f354"; }
+.bi-file-earmark-binary::before { content: "\f35c"; }
+.bi-file-earmark-code::before { content: "\f362"; }
+.bi-file-earmark-lock::before { content: "\f36f"; }
+.bi-file-earmark-richtext::before { content: "\f383"; }
+.bi-file-earmark-text::before { content: "\f38b"; }
+.bi-file-earmark-zip::before { content: "\f391"; }
+.bi-file-earmark::before { content: "\f392"; }
+.bi-file::before { content: "\f3c0"; }
+.bi-files::before { content: "\f3c2"; }
+.bi-folder::before { content: "\f3d7"; }
+.bi-funnel-fill::before { content: "\f3e0"; }
+.bi-funnel::before { content: "\f3e1"; }
+.bi-gear::before { content: "\f3e5"; }
+.bi-github::before { content: "\f3ed"; }
+.bi-globe::before { content: "\f3ee"; }
+.bi-grid-3x3-gap::before { content: "\f3f9"; }
+.bi-grid::before { content: "\f3fc"; }
+.bi-hand-index::before { content: "\f403"; }
+.bi-hash::before { content: "\f40a"; }
+.bi-hdd-network::before { content: "\f40d"; }
+.bi-headphones::before { content: "\f413"; }
+.bi-house-door::before { content: "\f423"; }
+.bi-image::before { content: "\f42a"; }
+.bi-images::before { content: "\f42b"; }
+.bi-info-circle::before { content: "\f431"; }
+.bi-info::before { content: "\f434"; }
+.bi-input-cursor-text::before { content: "\f435"; }
+.bi-journal-text::before { content: "\f444"; }
+.bi-key::before { content: "\f44f"; }
+.bi-layers::before { content: "\f45b"; }
+.bi-layout-sidebar::before { content: "\f45f"; }
+.bi-layout-wtf::before { content: "\f466"; }
+.bi-lightbulb::before { content: "\f46b"; }
+.bi-lightning::before { content: "\f46f"; }
+.bi-link-45deg::before { content: "\f470"; }
+.bi-link::before { content: "\f471"; }
+.bi-list-check::before { content: "\f473"; }
+.bi-list-nested::before { content: "\f474"; }
+.bi-list-ul::before { content: "\f478"; }
+.bi-list::before { content: "\f479"; }
+.bi-lock::before { content: "\f47b"; }
+.bi-map::before { content: "\f47f"; }
+.bi-markdown::before { content: "\f481"; }
+.bi-moon-stars::before { content: "\f496"; }
+.bi-newspaper::before { content: "\f4a3"; }
+.bi-option::before { content: "\f4ad"; }
+.bi-palette::before { content: "\f4b1"; }
+.bi-palette2::before { content: "\f4b2"; }
+.bi-pencil-square::before { content: "\f4ca"; }
+.bi-people::before { content: "\f4d0"; }
+.bi-percent::before { content: "\f4d1"; }
+.bi-person-circle::before { content: "\f4d7"; }
+.bi-person::before { content: "\f4e1"; }
+.bi-phone::before { content: "\f4e7"; }
+.bi-plug::before { content: "\f4f7"; }
+.bi-plus::before { content: "\f4fe"; }
+.bi-rulers::before { content: "\f523"; }
+.bi-scissors::before { content: "\f528"; }
+.bi-search::before { content: "\f52a"; }
+.bi-shield-check::before { content: "\f52f"; }
+.bi-shield-lock::before { content: "\f538"; }
+.bi-shield::before { content: "\f53f"; }
+.bi-shop::before { content: "\f543"; }
+.bi-sort-alpha-down::before { content: "\f571"; }
+.bi-speedometer2::before { content: "\f580"; }
+.bi-square::before { content: "\f584"; }
+.bi-stack::before { content: "\f585"; }
+.bi-star-fill::before { content: "\f586"; }
+.bi-star::before { content: "\f588"; }
+.bi-stopwatch::before { content: "\f597"; }
+.bi-sun::before { content: "\f5a2"; }
+.bi-table::before { content: "\f5aa"; }
+.bi-tag::before { content: "\f5b0"; }
+.bi-tags::before { content: "\f5b2"; }
+.bi-telegram::before { content: "\f5b3"; }
+.bi-terminal::before { content: "\f5c3"; }
+.bi-text-center::before { content: "\f5c4"; }
+.bi-text-paragraph::before { content: "\f5c8"; }
+.bi-textarea::before { content: "\f5cc"; }
+.bi-tools::before { content: "\f5db"; }
+.bi-trash::before { content: "\f5de"; }
+.bi-tree::before { content: "\f5e2"; }
+.bi-type-bold::before { content: "\f5f0"; }
+.bi-type-h1::before { content: "\f5f1"; }
+.bi-type::before { content: "\f5f7"; }
+.bi-upc-scan::before { content: "\f601"; }
+.bi-wifi-off::before { content: "\f61b"; }
+.bi-wifi::before { content: "\f61c"; }
+.bi-window::before { content: "\f620"; }
+.bi-x::before { content: "\f62a"; }
+.bi-coin::before { content: "\f634"; }
+.bi-currency-bitcoin::before { content: "\f635"; }
+.bi-dash-lg::before { content: "\f63b"; }
+.bi-file-earmark-pdf::before { content: "\f63e"; }
+.bi-plus-lg::before { content: "\f64d"; }
+.bi-translate::before { content: "\f658"; }
+.bi-x-lg::before { content: "\f659"; }
+.bi-line::before { content: "\f660"; }
+.bi-fingerprint::before { content: "\f671"; }
+.bi-graph-up-arrow::before { content: "\f673"; }
+.bi-git::before { content: "\f69d"; }
+.bi-plus-slash-minus::before { content: "\f6aa"; }
+.bi-qr-code-scan::before { content: "\f6ad"; }
+.bi-qr-code::before { content: "\f6ae"; }
+.bi-robot::before { content: "\f6b1"; }
+.bi-memory::before { content: "\f6e3"; }
+.bi-braces-asterisk::before { content: "\f70e"; }
+.bi-filetype-csv::before { content: "\f743"; }
+.bi-filetype-js::before { content: "\f74c"; }
+.bi-filetype-xml::before { content: "\f76b"; }
+.bi-filetype-yml::before { content: "\f76c"; }
+.bi-filetype-json::before { content: "\f791"; }
+.bi-escape::before { content: "\f7ee"; }
+.bi-indent::before { content: "\f7fe"; }
+.bi-pass::before { content: "\f809"; }
+.bi-rocket::before { content: "\f846"; }
+.bi-regex::before { content: "\f84d"; }
+.bi-person-lock::before { content: "\f8a8"; }
+.bi-database::before { content: "\f8c4"; }
+.bi-amazon::before { content: "\f68d"; }
+.bi-css::before { content: "\f917"; }
