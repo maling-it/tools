@@ -58,6 +58,9 @@ describe('mools mcp server', () => {
         expect(result.messages[0].role).toBe('user');
         expect(result.messages[0].content.text).toContain('login crashes');
         expect(result.messages[0].content.text).toContain('{{expected}}');
+        // Open placeholders are explained to the model.
+        expect(result.messages[0].content.text).toContain('Still open: {{expected}}, {{actual}}');
+        expect(result.messages[0].content.text).not.toContain('{{symptom}}, ');
         await expect(client.getPrompt({ name: 'nope' })).rejects.toThrow();
     });
 
@@ -103,4 +106,27 @@ describe('mools mcp server', () => {
         const results = await Promise.all(Array.from({ length: 30 }, (_, i) => client.callTool({ name: 'hash_text', arguments: { text: `job ${i}`, algorithm: 'sha256' } })));
         expect(results.every((r) => !r.isError && r.content[0].text.length === 64)).toBe(true);
     });
+
+    it('does not add a note when every placeholder is filled in', async () => {
+        const { client } = await connect();
+        const full = await client.getPrompt({ name: 'security-audit', arguments: { target: 'login' } });
+        expect(full.messages[0].content.text).not.toContain('Still open');
+        const none = await client.getPrompt({ name: 'code-review' });
+        expect(none.messages[0].content.text).not.toContain('Still open');
+    });
+
+    it('explains errors and empty results in plain words', async () => {
+        const { client } = await connect();
+        const bad = await client.callTool({ name: 'base64', arguments: { text: '***', mode: 'decode' } });
+        expect(bad.isError).toBe(true);
+        expect(bad.content[0].text).toBe('The input is not valid Base64, or it does not decode to UTF-8 text.');
+        const cron = await client.callTool({ name: 'cron_explain', arguments: { expression: '61 * * * *' } });
+        expect(cron.content[0].text).toBe('Invalid cron expression: minutes part must be >= 0 and <= 59');
+        const none = await client.callTool({ name: 'extract_data', arguments: { text: 'nothing here', kind: 'emails' } });
+        expect(none.isError).toBeFalsy();
+        expect(none.content[0].text).toBe('No email addresses found.');
+        const empty = await client.callTool({ name: 'slugify', arguments: { text: '!!!' } });
+        expect(empty.content[0].text).toBe('(The result is empty.)');
+    });
 });
+

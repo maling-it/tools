@@ -187,3 +187,31 @@ describe('reference data', () => {
         expect(HTTP_STATUS.find((s) => s.code === 404).name).toBe('Not Found');
     });
 });
+
+describe('friendlier error messages in the shared libraries', () => {
+    it('explainCron throws real Errors with a readable message', () => {
+        let error;
+        try {
+            explainCron('61 * * * *');
+        } catch (e) {
+            error = e;
+        }
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toBe('Invalid cron expression: minutes part must be >= 0 and <= 59');
+    });
+
+    it('lists the valid units and explains Roman numerals and dates', () => {
+        expect(() => convertUnit('length', 1, 'kg', 'm')).toThrow('"kg" is not a length unit. Use one of: m, km');
+        expect(() => convertUnit('nope', 1, 'a', 'b')).toThrow('Unknown category "nope"');
+        expect(() => fromRoman('abc')).toThrow('is not a Roman numeral');
+        expect(() => parseDateInput('soon')).toThrow('Could not understand "soon" as a date');
+    });
+
+    it('formats SQL errors on one line', () => {
+        expect(() => formatSql('select (')).toThrow(/^Could not format the SQL: Parse error/);
+    });
+
+    it('rejects text that is not a bcrypt hash before hashing anything', async () => {
+        await expect(bcryptCompare('x', 'plain text')).rejects.toThrow('does not look like a bcrypt hash');
+    });
+});

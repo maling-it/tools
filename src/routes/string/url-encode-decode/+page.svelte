@@ -6,16 +6,7 @@
 
     const actions = [
         { label: "Encode", transform: urlEncode },
-        {
-            label: "Decode",
-            transform: (value) => {
-                try {
-                    return urlDecode(value);
-                } catch {
-                    throw new Error("Malformed URL encoding, check for a stray % sign.");
-                }
-            }
-        }
+        { label: "Decode", transform: urlDecode }
     ];
 </script>
 

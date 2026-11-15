@@ -9,7 +9,6 @@
     let replacement = $state("");
     let regex = $state(false);
     let caseSensitive = $state(true);
-    let error = $state("");
     let status = $state("");
 
     // Patterns run in a worker with a time limit, so one with nested repeats cannot freeze the page.
@@ -41,7 +40,6 @@
     title="Replace Text Tool"
     description="Find and replace text in your content."
     bind:value={text}
-    bind:error
     {actions}
 >
     {#snippet extra()}
@@ -63,7 +61,7 @@
                 <label class="form-check-label" for="case-check">Case sensitive</label>
             </div>
         </div>
-        {#if status && !error}
+        {#if status}
             <p class="small text-body-secondary">{status}</p>
         {/if}
     {/snippet}

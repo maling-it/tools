@@ -60,7 +60,13 @@ export const unescapeJs = (text) =>
 
 // Throws a URIError on malformed input, callers decide how to report it.
 export const urlEncode = (text) => encodeURIComponent(text);
-export const urlDecode = (text) => decodeURIComponent(text.replace(/\+/g, ' '));
+export const urlDecode = (text) => {
+    try {
+        return decodeURIComponent(text.replace(/\+/g, ' '));
+    } catch {
+        throw new Error('The input has malformed percent-encoding, for example a stray % sign.');
+    }
+};
 
 // Case conversion
 const splitWords = (text) =>

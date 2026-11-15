@@ -1,6 +1,19 @@
 // Data format conversions: YAML, TOML, JSON and XML
 import YAML from 'yaml';
-import { parse as parseToml, stringify as stringifyToml } from 'smol-toml';
+import { parse as parseTomlText, stringify as stringifyToml } from 'smol-toml';
+import { parseJson } from './converters.js';
+
+// Parsers report their problem on the first line; say which format could not be read.
+const reading = (format, parse) => (text) => {
+    try {
+        return parse(text);
+    } catch (error) {
+        const reason = String(error.message).split('\n')[0].trim().replace(/^Invalid TOML document:\s*/, '');
+        throw new Error(`The input is not valid ${format}: ${reason}`);
+    }
+};
+const parseYaml = reading('YAML', (text) => YAML.parse(text));
+const parseToml = reading('TOML', parseTomlText);
 
 const toJson = (value, indent = 2) => JSON.stringify(value, null, indent);
 
@@ -11,11 +24,11 @@ const requireObject = (value, format) => {
     return value;
 };
 
-export const yamlToJson = (text, indent = 2) => toJson(YAML.parse(text), indent);
-export const jsonToYaml = (text) => YAML.stringify(JSON.parse(text), { indent: 2 }).trimEnd();
+export const yamlToJson = (text, indent = 2) => toJson(parseYaml(text), indent);
+export const jsonToYaml = (text) => YAML.stringify(parseJson(text), { indent: 2 }).trimEnd();
 export const tomlToJson = (text, indent = 2) => toJson(parseToml(text), indent);
-export const jsonToToml = (text) => stringifyToml(requireObject(JSON.parse(text), 'TOML')).trimEnd();
-export const yamlToToml = (text) => stringifyToml(requireObject(YAML.parse(text), 'TOML')).trimEnd();
+export const jsonToToml = (text) => stringifyToml(requireObject(parseJson(text), 'TOML')).trimEnd();
+export const yamlToToml = (text) => stringifyToml(requireObject(parseYaml(text), 'TOML')).trimEnd();
 export const tomlToYaml = (text) => YAML.stringify(parseToml(text), { indent: 2 }).trimEnd();
 
 const escapeXml = (text) => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -48,7 +61,7 @@ const toXml = (name, value, depth) => {
 };
 
 export const jsonToXml = (text, { root = 'root' } = {}) => {
-    const data = JSON.parse(text);
+    const data = parseJson(text);
     const keys = data !== null && typeof data === 'object' && !Array.isArray(data) ? Object.keys(data) : [];
     // A single top-level key becomes the root element, anything else is wrapped.
     if (keys.length === 1 && !keys[0].startsWith('@') && keys[0] !== '#text') {

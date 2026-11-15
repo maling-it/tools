@@ -37,7 +37,7 @@ export const parseCsv = (text, delimiter = ',') => {
         }
     }
 
-    if (quoted) throw new Error('Unterminated quoted field');
+    if (quoted) throw new Error('A quoted field is never closed: a " is missing at the end of it.');
     if (field !== '' || row.length > 0) {
         row.push(field);
         rows.push(row);
@@ -79,16 +79,29 @@ export const base64Encode = (text, { urlSafe = false } = {}) => {
 export const base64Decode = (text) => {
     const normalized = text.trim().replace(/-/g, '+').replace(/_/g, '/');
     const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
-    const binary = atob(padded);
-    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
-    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+    try {
+        const binary = atob(padded);
+        const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+        return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+    } catch {
+        throw new Error('The input is not valid Base64, or it does not decode to UTF-8 text.');
+    }
 };
 
 // JSON
-export const formatJson = (text, indent = 2) => JSON.stringify(JSON.parse(text), null, indent);
-export const minifyJson = (text) => JSON.stringify(JSON.parse(text));
+export const formatJson = (text, indent = 2) => JSON.stringify(parseJson(text), null, indent);
+export const minifyJson = (text) => JSON.stringify(parseJson(text));
 
 // CSV / JSON
+
+// JSON.parse says things like `Unexpected token 'o', "nope" is not valid JSON`; make clear that the input is the problem.
+export const parseJson = (text) => {
+    try {
+        return JSON.parse(text);
+    } catch (error) {
+        throw new Error(`The input is not valid JSON: ${error.message}`);
+    }
+};
 const csvCell = (value, delimiter) => {
     const text = value === null || value === undefined ? '' : typeof value === 'object' ? JSON.stringify(value) : String(value);
     return text.includes('"') || text.includes('\n') || text.includes('\r') || text.includes(delimiter)
@@ -97,7 +110,7 @@ const csvCell = (value, delimiter) => {
 };
 
 export const jsonToCsv = (text, { delimiter = ',' } = {}) => {
-    const data = JSON.parse(text);
+    const data = parseJson(text);
     const rows = Array.isArray(data) ? data : [data];
     if (rows.some((row) => row === null || typeof row !== 'object' || Array.isArray(row))) {
         throw new Error('Expected a JSON object or an array of objects.');
@@ -149,7 +162,7 @@ const escapeProperty = (text, isKey) =>
         .replace(isKey ? /[=: ]/g : /^ /, (char) => `\\${char}`);
 
 export const jsonToProperties = (text) => {
-    const data = JSON.parse(text);
+    const data = parseJson(text);
     if (data === null || typeof data !== 'object') throw new Error('Expected a JSON object or array.');
     return Object.entries(flatten(data, '', {}))
         .map(([key, value]) => `${escapeProperty(key, true)}=${escapeProperty(value, false)}`)

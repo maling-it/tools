@@ -94,4 +94,62 @@ describe('agent tools', () => {
         expect(result.nextRuns[0].local).toMatch(/^\d{4}-\d{2}-\d{2} 08:30$/);
         expect(result.nextRuns[0].utc).toMatch(/Z$/);
     });
+
+    describe('error messages say what to fix', () => {
+        const cases = [
+            ['base64', { text: '***', mode: 'decode' }, 'not valid Base64'],
+            ['url_encode', { text: '%E0%A4%A', mode: 'decode' }, 'malformed percent-encoding'],
+            ['json_format', { json: '{a:1}' }, 'The input is not valid JSON'],
+            ['json_to_csv', { json: 'nope' }, 'The input is not valid JSON'],
+            ['json_properties', { text: 'nope', direction: 'json_to_properties' }, 'The input is not valid JSON'],
+            ['convert_data_format', { text: 'a: [1', from: 'yaml', to: 'json' }, 'The input is not valid YAML'],
+            ['convert_data_format', { text: '[x', from: 'toml', to: 'json' }, 'The input is not valid TOML'],
+            ['convert_data_format', { text: '{bad', from: 'json', to: 'yaml' }, 'The input is not valid JSON'],
+            ['convert_data_format', { text: 'a', from: 'toml', to: 'xml' }, 'Supported: yaml to json'],
+            ['csv_to_json', { csv: 'a,"b' }, 'never closed'],
+            ['unit_convert', { category: 'length', value: 1, from: 'kg', to: 'm' }, '"kg" is not a length unit. Use one of: m, km'],
+            ['roman_numeral', { value: 'hello' }, 'is not a Roman numeral'],
+            ['roman_numeral', { value: 'IIII' }, 'write IV, not IIII'],
+            ['timestamp_convert', { value: 'nonsense' }, 'Could not understand "nonsense" as a date'],
+            ['cron_explain', { expression: '61 * * * *' }, 'Invalid cron expression: minutes part must be'],
+            ['bcrypt', { password: 'x', hash: 'notahash' }, 'does not look like a bcrypt hash'],
+            ['format_sql', { sql: 'select (' }, 'Could not format the SQL'],
+            ['work_hours', { start: 'x', end: '17:00' }, 'The start time "x" is not valid'],
+            ['title_ideas', { topic: '  ' }, 'Give a topic']
+        ];
+        for (const [name, args, message] of cases) {
+            it(`${name}: ${message}`, async () => {
+                await expect(callAgentTool(name, args)).rejects.toThrow(message);
+            });
+        }
+
+        it('never throws something that is not an Error', async () => {
+            for (const [name, args] of cases) {
+                const error = await callAgentTool(name, args).catch((e) => e);
+                expect(error, name).toBeInstanceOf(Error);
+                expect(error.message, name).not.toBe('');
+            }
+        });
+    });
+
+    describe('empty results say so', () => {
+        it('extract_data names what was not found', async () => {
+            expect(await callAgentTool('extract_data', { text: 'nothing here', kind: 'emails' })).toBe('No email addresses found.');
+            expect(await callAgentTool('extract_data', { text: 'nothing here', kind: 'urls' })).toBe('No URLs found.');
+            expect(await callAgentTool('extract_data', { text: 'nothing here', kind: 'hashtags' })).toBe('No hashtags found.');
+            expect(await callAgentTool('extract_data', { text: 'a@b.com', kind: 'emails' })).toBe('a@b.com');
+        });
+
+        it('other tools explain an empty answer', async () => {
+            expect(await callAgentTool('remove_stopwords', { text: 'the and of' })).toContain('every word is a stopword');
+            expect(await callAgentTool('unique_words', { text: '' })).toBe('No words found.');
+        });
+
+        it('no tool answers with an empty string', async () => {
+            expect(await callAgentTool('slugify', { text: '!!!' })).toBe('(The result is empty.)');
+            expect(await callAgentTool('markdown_to_html', { markdown: '' })).toBe('(The result is empty.)');
+            expect(await callAgentTool('base64', { text: '', mode: 'encode' })).toBe('(The result is empty.)');
+        });
+    });
 });
+
