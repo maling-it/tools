@@ -4,6 +4,9 @@ All notable changes to Mools are documented here. The format follows [Keep a Cha
 
 ## [Unreleased]
 
+### Fixed
+- A regular expression with catastrophic backtracking, for example `(a+)+$`, no longer freezes the browser tab. Regex Tester, Replace Text, Bulk File Find & Replace, the "Find and replace" operation of the Bulk Text Transformer and the rename rules of the Bulk File Renamer now run patterns in a Web Worker with a time limit of a few seconds. A pattern that takes too long is stopped with a clear message, and the tool keeps working. Plain (non-regex) searches run as before. ([#20](https://github.com/maling-it/tools/issues/20))
+
 ## [1.2.0] - 2026-11-15
 
 Mools now works offline, remembers your favorite tools and has a hardened MCP server. The project also has browser tests, a public roadmap and a complete set of community files.

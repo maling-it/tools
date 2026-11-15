@@ -1,6 +1,8 @@
 <script>
     import ToolPage from "../../../components/ToolPage.svelte";
+    import { onMount } from "svelte";
     import { replaceText } from "#lib/textUtils.js";
+    import { createRegexRunner, isRegexTimeout } from "#lib/safeRegex.js";
 
     let text = $state("");
     let find = $state("");
@@ -10,16 +12,24 @@
     let error = $state("");
     let status = $state("");
 
+    // Patterns run in a worker with a time limit, so one with nested repeats cannot freeze the page.
+    const runner = createRegexRunner();
+    onMount(() => () => runner.close());
+
     const actions = [
         {
             label: "Replace All",
-            transform: (value) => {
+            transform: async (value) => {
                 status = "";
+                const options = { regex, caseSensitive };
                 try {
-                    const result = replaceText(value, find, replacement, { regex, caseSensitive });
+                    const result = regex
+                        ? await runner.run({ type: "replace", text: value, find, replacement, options })
+                        : replaceText(value, find, replacement, options);
                     status = `${result.count} replacement${result.count === 1 ? "" : "s"} made.`;
                     return result.text;
-                } catch {
+                } catch (e) {
+                    if (isRegexTimeout(e)) throw e;
                     throw new Error("Invalid regular expression.");
                 }
             }

@@ -1,4 +1,7 @@
 <script>
+    import { onMount } from "svelte";
+    import { createRegexRunner, isRegexSuperseded } from "#lib/safeRegex.js";
+    import { regexMatches } from "#lib/regexMatches.js";
     let pattern = $state("(\\w+)@(\\w+)\\.com");
     let flags = $state("g");
     let text = $state("alice@example.com, bob@test.com");
@@ -6,17 +9,33 @@
 
     const FLAG_OPTIONS = [["g", "global"], ["i", "ignore case"], ["m", "multiline"], ["s", "dot all"], ["u", "unicode"]];
 
-    const result = $derived.by(() => {
-        if (pattern === "") return { matches: [], replaced: "", error: "" };
-        try {
-            const regex = new RegExp(pattern, flags.includes("g") ? flags : flags + "g");
-            const matches = [...text.matchAll(regex)].slice(0, 500).map((m) => ({ text: m[0], index: m.index, groups: m.slice(1), named: m.groups ?? null }));
-            const replaced = replacement !== "" ? text.replace(new RegExp(pattern, flags), replacement) : "";
-            return { matches, replaced, error: "" };
-        } catch (e) {
-            return { matches: [], replaced: "", error: e.message };
+    // The pattern runs in a worker with a time limit: a pattern with nested repeats such as (a+)+$ would otherwise freeze the page.
+    const runner = createRegexRunner();
+    // The starting example is safe to run directly, so the page already shows its matches when it is first rendered.
+    // svelte-ignore state_referenced_locally
+    let result = $state({ ...regexMatches({ pattern, flags, text, replacement }), error: "" });
+
+    $effect(() => {
+        const job = { type: "matches", pattern, flags, text, replacement };
+        if (pattern === "") {
+            result = { matches: [], replaced: "", error: "" };
+            runner.close();
+            return;
         }
+        let cancelled = false;
+        runner.run(job).then(
+            ({ matches, replaced }) => {
+                if (!cancelled) result = { matches, replaced, error: "" };
+            },
+            (e) => {
+                if (cancelled || isRegexSuperseded(e)) return;
+                result = { matches: [], replaced: "", error: e.message };
+            }
+        );
+        return () => (cancelled = true);
     });
+
+    onMount(() => () => runner.close());
 
     const toggle = (flag) => {
         flags = flags.includes(flag) ? flags.replace(flag, "") : flags + flag;

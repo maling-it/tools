@@ -1,5 +1,7 @@
 <script>
+    import { onMount } from "svelte";
     import { replaceText } from "#lib/textUtils.js";
+    import { createRegexRunner, isRegexSuperseded } from "#lib/safeRegex.js";
     import { formatBytes } from "#lib/image.js";
     import { downloadZip, textBytes } from "#lib/zip.js";
     import { shouldIgnorePath } from "#lib/vibe.js";
@@ -35,14 +37,43 @@
         busy = false;
     };
 
-    const results = $derived.by(() => {
-        if (!find) return { rows: docs.map((d) => ({ ...d, out: d.text, count: 0 })), error: "" };
-        try {
-            return { rows: docs.map((d) => ({ ...d, ...(({ text, count }) => ({ out: text, count }))(replaceText(d.text, find, replacement, { regex, caseSensitive })) })), error: "" };
-        } catch {
-            return { rows: [], error: "That regular expression is not valid." };
-        }
+    // A plain search cannot get stuck, so it runs directly. A regular expression runs in a worker with a time limit,
+    // because a pattern with nested repeats would otherwise freeze the page.
+    const regexMode = $derived(regex && find !== "");
+    const runner = createRegexRunner({ timeoutMs: 5000 });
+    let regexResults = $state({ rows: [], error: "" });
+
+    const plainResults = $derived({
+        rows: docs.map((d) => {
+            if (!find) return { ...d, out: d.text, count: 0 };
+            const { text: out, count } = replaceText(d.text, find, replacement, { regex: false, caseSensitive });
+            return { ...d, out, count };
+        }),
+        error: ""
     });
+
+    $effect(() => {
+        if (!regexMode) {
+            runner.close();
+            return;
+        }
+        const job = { type: "replaceDocuments", docs: docs.map(({ name, text }) => ({ name, text })), find, replacement, options: { regex: true, caseSensitive } };
+        let cancelled = false;
+        runner.run(job).then(
+            (rows) => {
+                if (!cancelled) regexResults = { rows, error: "" };
+            },
+            (e) => {
+                if (cancelled || isRegexSuperseded(e)) return;
+                regexResults = { rows: [], error: e.name === "RegexTimeoutError" ? e.message : "That regular expression is not valid." };
+            }
+        );
+        return () => (cancelled = true);
+    });
+
+    onMount(() => () => runner.close());
+
+    const results = $derived(regexMode ? regexResults : plainResults);
 
     const changedRows = $derived(results.rows.filter((r) => r.count > 0));
     const total = $derived(changedRows.reduce((sum, r) => sum + r.count, 0));

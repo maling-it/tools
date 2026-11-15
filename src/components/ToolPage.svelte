@@ -5,7 +5,7 @@
      * Shared layout for text tools.
      *
      * `actions` are `{ label, transform, variant? }` buttons; `transform` receives the
-     * current text and returns the new text. Thrown errors are shown in an alert.
+     * current text and returns the new text (or a promise of it). Thrown errors are shown in an alert.
      * `extra` renders additional inputs above the textarea, `output` renders a result column.
      */
     let {
@@ -23,12 +23,17 @@
 
     let copied = $state(false);
 
-    const run = (action) => {
-        error = '';
+    let busy = $state(false);
+
+    const run = async (action) => {
+        error = "";
+        busy = true;
         try {
-            value = action.transform(value);
+            value = await action.transform(value);
         } catch (e) {
             error = e.message;
+        } finally {
+            busy = false;
         }
     };
 
@@ -82,6 +87,7 @@
                     <button
                         class="btn {action.variant ?? 'btn-primary'}"
                         type="button"
+                        disabled={busy}
                         onclick={() => run(action)}
                     >
                         {action.label}
