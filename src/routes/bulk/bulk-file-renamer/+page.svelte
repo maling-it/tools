@@ -1,5 +1,7 @@
 <script>
+    import { onMount } from "svelte";
     import OutputCard from "../../../components/OutputCard.svelte";
+    import { createRegexRunner, isRegexSuperseded } from "#lib/safeRegex.js";
     import { RENAME_CASES, planRename, renameScript } from "#lib/bulk.js";
     import { downloadZip } from "#lib/zip.js";
 
@@ -10,13 +12,44 @@
 
     const list = $derived(names.split(/\r?\n/).map((n) => n.trim()).filter(Boolean));
 
-    const result = $derived.by(() => {
+    const rules = $derived({ ...o, numbering: o.numbering || undefined, start: Number(o.start) || 0, pad: Number(o.pad) || 1 });
+
+    // Plain rules cannot get stuck, so they run directly. A regular expression runs in a worker with a time limit,
+    // because a pattern with nested repeats would otherwise freeze the page.
+    const regexMode = $derived(o.regex && o.find !== "");
+    const runner = createRegexRunner({ timeoutMs: 5000 });
+    let regexResult = $state({ plan: [], error: "" });
+
+    const plainResult = $derived.by(() => {
         try {
-            return { plan: planRename(list, { ...o, numbering: o.numbering || undefined, start: Number(o.start) || 0, pad: Number(o.pad) || 1 }), error: "" };
+            return { plan: planRename(list, rules), error: "" };
         } catch (e) {
-            return { plan: [], error: e.message.includes("Invalid") ? "That regular expression is not valid." : e.message };
+            return { plan: [], error: e.message };
         }
     });
+
+    $effect(() => {
+        if (!regexMode) {
+            runner.close();
+            return;
+        }
+        const job = { type: "renamePlan", names: [...list], rules: { ...rules } };
+        let cancelled = false;
+        runner.run(job).then(
+            (plan) => {
+                if (!cancelled) regexResult = { plan, error: "" };
+            },
+            (e) => {
+                if (cancelled || isRegexSuperseded(e)) return;
+                regexResult = { plan: [], error: e.name === "RegexTimeoutError" ? e.message : "That regular expression is not valid." };
+            }
+        );
+        return () => (cancelled = true);
+    });
+
+    onMount(() => () => runner.close());
+
+    const result = $derived(regexMode ? regexResult : plainResult);
 
     const conflicts = $derived(result.plan.filter((p) => p.conflict).length);
     const changed = $derived(result.plan.filter((p) => p.changed).length);

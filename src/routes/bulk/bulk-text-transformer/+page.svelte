@@ -1,6 +1,8 @@
 <script>
+    import { onMount } from "svelte";
     import OutputCard from "../../../components/OutputCard.svelte";
     import { LINE_OPERATIONS, runBulk } from "#lib/bulk.js";
+    import { createRegexRunner, isRegexSuperseded } from "#lib/safeRegex.js";
 
     let text = $state("");
     let operation = $state("urlEncode");
@@ -9,18 +11,35 @@
 
     const groups = [...new Set(LINE_OPERATIONS.map((op) => op.group))];
 
+    // A regular expression runs in a worker with a time limit, so a pattern with nested repeats cannot freeze the page.
+    const runner = createRegexRunner({ timeoutMs: 5000 });
+    let notice = $state("");
+
     $effect(() => {
         const [input, op, opts] = [text, operation, { ...options }];
         let cancelled = false;
+        notice = "";
         if (!input) {
             rows = [];
+            runner.close();
             return;
         }
-        runBulk(input, op, opts).then((result) => {
-            if (!cancelled) rows = result;
-        });
+        const usesRegex = op === "replace" && opts.regex && opts.find;
+        const pending = usesRegex ? runner.run({ type: "bulkLines", text: input, operation: op, options: opts }) : (runner.close(), runBulk(input, op, opts));
+        pending.then(
+            (result) => {
+                if (!cancelled) rows = result;
+            },
+            (e) => {
+                if (cancelled || isRegexSuperseded(e)) return;
+                rows = [];
+                notice = e.message;
+            }
+        );
         return () => (cancelled = true);
     });
+
+    onMount(() => () => runner.close());
 
     const outputs = $derived(rows.map((r) => r.output).join("\n"));
     const failed = $derived(rows.filter((r) => r.error).length);
@@ -71,6 +90,9 @@
     </div>
     <div class="col-lg-6">
         <OutputCard title="Result ({rows.length} lines{failed ? `, ${failed} failed` : ''})" text={outputs} filename="result.txt" />
+        {#if notice}
+            <div class="alert alert-warning mt-3 mb-0" role="alert">{notice}</div>
+        {/if}
         {#if failed}
             <div class="alert alert-warning mt-3 mb-0" role="status">
                 <strong>{failed} line{failed === 1 ? "" : "s"} could not be processed:</strong>

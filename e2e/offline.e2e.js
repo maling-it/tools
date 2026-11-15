@@ -53,6 +53,11 @@ test('every page and tool works offline after one visit', async ({ page, context
 	await page.getByRole('button', { name: 'Replace All' }).click();
 	await expect(page.locator('#main-textarea')).toHaveValue('bbnbnb');
 
+	// Patterns run in a Web Worker, which must be available offline too.
+	await page.goto('/tools/string/regex-tester/');
+	await page.fill('#pattern', 'o');
+	await expect(page.getByRole('heading', { name: /\d+ match/ })).toContainText('3 matches');
+
 	// Client side navigation and the machine readable files also work.
 	await page.locator('#sidebar').getByRole('link', { name: 'Word Count' }).click();
 	await expect(page).toHaveURL(/\/string\/word-counter\/$/);
