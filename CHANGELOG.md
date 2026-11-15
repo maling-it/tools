@@ -4,11 +4,17 @@ All notable changes to Mools are documented here. The format follows [Keep a Cha
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-15
+
+Mools is now accessible (WCAG 2.1 AA), friendlier to agents, safer with regular expressions and watches its own size.
+
 ### Added
 - **Accessibility pass (WCAG 2.1 AA).** A "Skip to main content" link and a `main` region, labelled navigation landmarks, a clear 3 pixel focus outline in every theme and style, and support for reduced motion. The command palette now follows the combobox pattern (`aria-activedescendant`, Home and End, focus kept inside, focus restored on close). Copying, favorites, palette results and live converter output are announced to screen readers. Wordle no longer relies on color alone. The accessibility statement describes what is covered and what is not.
+- **Performance budget.** `bun run budget` measures the JavaScript and CSS each of the 128 pages loads eagerly and fails when a page goes over its budget. It runs on every pull request. ([#8](https://github.com/maling-it/tools/issues/8))
 - Automated accessibility tests (axe-core) in the browser tests: all 128 pages in the light default style, a set of 12 pages in every other theme and style, and the open command palette. They run on every pull request.
 
 ### Changed
+- **Smaller pages.** Only the Bootstrap Icons the site uses are shipped, so the global CSS drops from 62 KB to 50 KB gzipped. After adding an icon, run `node scripts/build-icons-css.mjs`.
 - Better contrast: secondary text and inline code in dark mode, the count badges on the home page, the technology badges and statistics on the About page. The About statistics now show the real number of tools and categories.
 - The sidebar markup is valid (dividers no longer sit directly inside the list), decorative logos have empty alt text, and the desktop Search button has an accessible name that matches its label.
 
