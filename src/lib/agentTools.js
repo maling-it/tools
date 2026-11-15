@@ -23,6 +23,19 @@ const object = (properties, required = Object.keys(properties)) => ({ type: 'obj
 const mode = (a, b) => string(`Operation to perform: "${a}" or "${b}"`, { enum: [a, b] });
 const out = (value) => (typeof value === 'string' ? value : JSON.stringify(value, null, 2));
 
+// JSON.parse and friends throw bare messages such as `Unexpected token 'o', "nope" is not valid JSON`; say what failed.
+const withJsonErrors = (run) => (args) => {
+    try {
+        return run(args);
+    } catch (error) {
+        if (error instanceof SyntaxError) throw new Error(`The input is not valid JSON: ${error.message}`);
+        throw error;
+    }
+};
+
+// The first line of a parser message, which is where the parsers say what is wrong.
+const firstLine = (message) => String(message).split('\n')[0].trim();
+
 const pair = (escape, unescape) => (args) => (args.mode === 'unescape' ? unescape(args.text) : escape(args.text));
 
 /**
@@ -85,13 +98,13 @@ export const agentTools = [
         name: 'remove_stopwords',
         description: 'Remove common English stopwords from text.',
         inputSchema: object({ text: string('Text to clean') }),
-        run: ({ text }) => removeStopwords(text)
+        run: ({ text }) => removeStopwords(text) || (text.trim() ? 'Nothing is left: every word is a stopword.' : 'The text is empty.')
     },
     {
         name: 'unique_words',
         description: 'List the distinct words of a text, one per line, case-insensitively.',
         inputSchema: object({ text: string('Text to read'), sort: bool('Sort alphabetically') }, ['text']),
-        run: ({ text, sort = false }) => uniqueWords(text, { sort })
+        run: ({ text, sort = false }) => uniqueWords(text, { sort }) || 'No words found.'
     },
     {
         name: 'csv_to_json',
@@ -103,7 +116,7 @@ export const agentTools = [
         name: 'json_to_csv',
         description: 'Convert a JSON array of objects to CSV.',
         inputSchema: object({ json: string('JSON text'), delimiter: string('Field delimiter, default ","') }, ['json']),
-        run: ({ json, delimiter = ',' }) => jsonToCsv(json, { delimiter })
+        run: withJsonErrors(({ json, delimiter = ',' }) => jsonToCsv(json, { delimiter }))
     },
     {
         name: 'csv_to_html_table',
@@ -121,13 +134,13 @@ export const agentTools = [
         name: 'json_format',
         description: 'Validate and prettify or minify JSON. Fails with a parse error for invalid JSON.',
         inputSchema: object({ json: string('JSON text'), minify: bool('Minify instead of prettify'), indent: number('Spaces of indentation when prettifying, default 2') }, ['json']),
-        run: ({ json, minify = false, indent = 2 }) => (minify ? minifyJson(json) : formatJson(json, indent))
+        run: withJsonErrors(({ json, minify = false, indent = 2 }) => (minify ? minifyJson(json) : formatJson(json, indent)))
     },
     {
         name: 'json_properties',
         description: 'Convert between JSON and Java .properties format.',
         inputSchema: object({ text: string('Input text'), direction: string('Conversion direction', { enum: ['json_to_properties', 'properties_to_json'] }) }),
-        run: ({ text, direction }) => (direction === 'properties_to_json' ? propertiesToJson(text) : jsonToProperties(text))
+        run: withJsonErrors(({ text, direction }) => (direction === 'properties_to_json' ? propertiesToJson(text) : jsonToProperties(text)))
     },
     {
         name: 'base64',
@@ -211,7 +224,10 @@ export const agentTools = [
         name: 'title_ideas',
         description: 'Suggest page title ideas for a topic.',
         inputSchema: object({ topic: string('Topic or keyword') }),
-        run: ({ topic }) => makeTitles(topic).join('\n')
+        run: ({ topic }) => {
+            if (!topic.trim()) throw new Error('Give a topic or keyword, for example "home gardening".');
+            return makeTitles(topic).join('\n');
+        }
     },
     {
         name: 'html_link',
@@ -260,6 +276,9 @@ export const agentTools = [
         description: 'Hours worked between two HH:MM times minus a break; an end before the start means an overnight shift.',
         inputSchema: object({ start: string('Start time HH:MM'), end: string('End time HH:MM'), breakMinutes: number('Break in minutes') }, ['start', 'end']),
         run: ({ start, end, breakMinutes = 0 }) => {
+            for (const [label, time] of [['start', start], ['end', end]]) {
+                if (!/^([01]?\d|2[0-3]):[0-5]\d$/.test(time)) throw new Error(`The ${label} time "${time}" is not valid. Use HH:MM on a 24 hour clock, for example 09:30.`);
+            }
             const minutes = workMinutes(start, end, breakMinutes);
             return out({ minutes, formatted: formatMinutes(minutes), decimalHours: Number((minutes / 60).toFixed(2)) });
         }
@@ -272,7 +291,7 @@ export const agentTools = [
             if (from === to) throw new Error('Source and target format are the same.');
             const table = { 'yaml>json': yamlToJson, 'json>yaml': jsonToYaml, 'toml>json': tomlToJson, 'json>toml': jsonToToml, 'yaml>toml': yamlToToml, 'toml>yaml': tomlToYaml, 'json>xml': jsonToXml };
             const convert = table[`${from}>${to}`];
-            if (!convert) throw new Error(`Converting ${from} to ${to} is not supported.`);
+            if (!convert) throw new Error(`Converting ${from} to ${to} is not supported. Supported: ${Object.keys(table).map((k) => k.replace('>', ' to ')).join(', ')}.`);
             return convert(text);
         }
     },
@@ -565,9 +584,14 @@ export const agentTools = [
     },
     {
         name: 'extract_data',
-        description: 'Extract emails, URLs, domains, IPv4 addresses, UUIDs, hashtags, mentions, HEX colors, numbers or phone numbers from text. One result per line.',
+        description: 'Extract emails, URLs, domains, IPv4 addresses, UUIDs, hashtags, mentions, HEX colors, numbers or phone numbers from text. One result per line. When nothing matches, the result is a sentence such as "No email addresses found."',
         inputSchema: object({ text: string('Text to search'), kind: string('What to extract', { enum: Object.keys(EXTRACTORS) }), unique: bool('Remove duplicates, default true'), sort: bool('Sort the results') }, ['text', 'kind']),
-        run: ({ text, kind, unique = true, sort = false }) => extractData(text, kind, { unique, sort }).join('\n')
+        run: ({ text, kind, unique = true, sort = false }) => {
+            const items = extractData(text, kind, { unique, sort });
+            // Lowercase the first letter of a plain word ("Email addresses") but keep acronyms ("URLs", "IPv4 addresses").
+            const label = EXTRACTORS[kind].label.replace(/^([A-Z])([a-z])/, (_, a, b) => a.toLowerCase() + b);
+            return items.length ? items.join('\n') : `No ${label} found.`;
+        }
     },
     {
         name: 'chunk_text',
@@ -677,5 +701,7 @@ export const callAgentTool = async (name, args = {}) => {
     if (!tool) throw new Error(`Unknown tool "${name}".`);
     const problems = validateArguments(tool.inputSchema, args);
     if (problems.length) throw new Error(problems.join(' '));
-    return out(await tool.run(args));
+    const text = out(await tool.run(args));
+    // A tool never answers with nothing, which clients show as "completed with no output".
+    return text === '' ? '(The result is empty.)' : text;
 };

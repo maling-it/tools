@@ -90,3 +90,45 @@ test('Contact form opens a pre-filled GitHub issue form', async ({ page, context
 	expect(url.searchParams.get('tool')).toBe('JSON Formatter');
 	await popup.close();
 });
+
+test('Crontab Generator explains an invalid expression instead of showing nothing', async ({ page }) => {
+	await page.goto('/tools/generator/cron-generator/');
+	await page.fill('#cron', '61 * * * *');
+	await expect(page.getByRole('alert')).toContainText('Invalid cron expression: minutes part must be');
+	await page.fill('#cron', '0 9 * * 1-5');
+	await expect(page.getByText('At 09:00, Monday through Friday')).toBeVisible();
+});
+
+test('live converters show an error for invalid input instead of an empty result', async ({ page }) => {
+	const cases = [
+		['/tools/converter/json-to-csv/', '{oops', 'not valid JSON'],
+		['/tools/converter/csv-to-json/', 'a,"b', 'never closed'],
+		['/tools/converter/yaml-to-json/', 'a: [1', 'not valid'],
+		['/tools/converter/xml-to-json/', '<a>', 'Invalid XML'],
+		['/tools/security/jwt-decoder/', 'abc', 'dot-separated parts'],
+		['/tools/calculator/csv-crypto-avg-calculator/', '1,100\nbad', 'must look like']
+	];
+	for (const [url, input, message] of cases) {
+		await page.goto(url);
+		await page.fill('#main-textarea', input);
+		await expect(page.getByRole('alert'), url).toContainText(message);
+		await page.fill('#main-textarea', '');
+		await expect(page.getByRole('alert'), `${url} after clearing`).toHaveCount(0);
+	}
+});
+
+test('invalid input is explained in the Base64, URL and SQL tools', async ({ page }) => {
+	await page.goto('/tools/converter/base64/');
+	await page.fill('#main-textarea', '***');
+	await page.getByRole('button', { name: 'Decode' }).click();
+	await expect(page.getByRole('alert')).toContainText('not valid Base64');
+
+	await page.goto('/tools/string/url-encode-decode/');
+	await page.fill('#main-textarea', '%E0%A4%A');
+	await page.getByRole('button', { name: 'Decode' }).click();
+	await expect(page.getByRole('alert')).toContainText('malformed percent-encoding');
+
+	await page.goto('/tools/converter/sql-formatter/');
+	await page.fill('#main-textarea', 'select (');
+	await expect(page.getByRole('alert')).toContainText('Could not format the SQL');
+});

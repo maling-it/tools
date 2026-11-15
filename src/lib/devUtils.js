@@ -148,14 +148,14 @@ export const toRoman = (number) => {
 
 export const fromRoman = (text) => {
     const roman = text.trim().toUpperCase();
-    if (!/^[MDCLXVI]+$/.test(roman)) throw new Error('Not a valid Roman numeral.');
+    if (!/^[MDCLXVI]+$/.test(roman)) throw new Error(`"${text.trim()}" is not a Roman numeral. Use the letters I, V, X, L, C, D and M, for example XIV.`);
     const values = { I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000 };
     let total = 0;
     for (let i = 0; i < roman.length; i++) {
         const value = values[roman[i]];
         total += value < (values[roman[i + 1]] ?? 0) ? -value : value;
     }
-    if (toRoman(total) !== roman) throw new Error('Not a valid Roman numeral.');
+    if (toRoman(total) !== roman) throw new Error(`"${roman}" is not written the standard way. Roman numerals do not repeat a letter more than three times in a row (write IV, not IIII).`);
     return total;
 };
 
@@ -169,7 +169,7 @@ export const parseDateInput = (text) => {
         return new Date(Math.abs(n) >= 1e12 ? n : n * 1000);
     }
     const date = new Date(input);
-    if (Number.isNaN(date.getTime())) throw new Error('Could not understand that date.');
+    if (Number.isNaN(date.getTime())) throw new Error(`Could not understand "${input}" as a date. Use a Unix timestamp (seconds or milliseconds) or a date such as 2026-11-15T10:30:00Z.`);
     return date;
 };
 
@@ -305,7 +305,10 @@ export const UNITS = {
 
 export const convertUnit = (category, value, from, to) => {
     const table = UNITS[category];
-    if (!table || !(from in table) || !(to in table)) throw new Error('Unknown unit.');
+    if (!table) throw new Error(`Unknown category "${category}". Use one of: ${Object.keys(UNITS).join(', ')}.`);
+    for (const unit of [from, to]) {
+        if (!(unit in table)) throw new Error(`"${unit}" is not a ${category} unit. Use one of: ${Object.keys(table).join(', ')}.`);
+    }
     const n = Number(value);
     if (!Number.isFinite(n)) throw new Error('Enter a number.');
     if (category === 'temperature') {

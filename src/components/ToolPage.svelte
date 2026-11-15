@@ -17,22 +17,25 @@
         placeholder = 'Enter your text here',
         rows = 8,
         actions = [],
-        error = $bindable(''),
+        // A problem with the current input, worked out by the page (for example an invalid pattern in a live converter).
+        error = '',
         extra,
         output
     } = $props();
 
     let copied = $state(false);
 
+    // A problem reported by an action button; it is cleared when the text changes.
+    let actionError = $state('');
     let busy = $state(false);
 
     const run = async (action) => {
-        error = "";
+        actionError = '';
         busy = true;
         try {
             value = await action.transform(value);
         } catch (e) {
-            error = e.message;
+            actionError = e.message;
         } finally {
             busy = false;
         }
@@ -48,7 +51,7 @@
 
     const clear = () => {
         value = '';
-        error = '';
+        actionError = '';
     };
 </script>
 
@@ -76,12 +79,12 @@
                     {rows}
                     {placeholder}
                     spellcheck="false"
-                    oninput={() => (error = '')}
+                    oninput={() => (actionError = '')}
                 ></textarea>
             </div>
 
-            {#if error}
-                <div class="alert alert-danger py-2" role="alert">{error}</div>
+            {#if actionError || error}
+                <div class="alert alert-danger py-2" role="alert">{actionError || error}</div>
             {/if}
 
             <div class="d-flex gap-2 flex-wrap">

@@ -84,6 +84,16 @@ test.describe('axe: interactive states', () => {
 		});
 	}
 
+	for (const [theme, core] of [['light', 'default'], ['dark', 'modern'], ['dark', 'elegant']]) {
+		test(`a live converter showing an error (${theme} ${core})`, async ({ page }) => {
+			await setLook(page, theme, core);
+			await page.goto('/tools/converter/json-to-csv/');
+			await page.fill('#main-textarea', '{oops');
+			await expect(page.getByRole('alert')).toContainText('not valid JSON');
+			expect(await violationsOf(page)).toEqual([]);
+		});
+	}
+
 	test('a tool with a result and an error', async ({ page }) => {
 		await page.goto('/tools/converter/json-formatter/');
 		await page.fill('#main-textarea', '{oops');

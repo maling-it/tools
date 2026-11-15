@@ -106,6 +106,23 @@ Mools is built to be used by AI agents as well as people:
   - **Prompts**: the prompt library (`src/lib/prompts.js`, 24 prompts) as MCP prompts, with each `{{placeholder}}` as an argument.
   - **Resources**: `mools://catalog` (all web tools) and `mools://prompts` (the prompt library).
 
+  Tool results are plain text. Errors say what to fix (for example `The input is not valid JSON: ...`), a search without matches says so (`No email addresses found.`), and no tool answers with an empty response.
+
+  ### Using the prompts in Claude Code
+
+  Claude Code turns each MCP prompt into a slash command named `/mcp__mools__<prompt>`, for example:
+
+  ```text
+  /mcp__mools__fix-bug              Claude asks you for the symptom, what you expected and what happened
+  /mcp__mools__security-audit login-endpoint
+  /mcp__mools__commit-message
+  ```
+
+  The prompts are listed by `/` completion (24 of them, from `plan-feature` to `accessibility`). Two things to know:
+
+  - Claude Code passes **one word per argument**, so give a single word (or join words with hyphens) or leave the arguments out. Placeholders that stay open are marked at the end of the prompt, and the model takes them from the conversation or asks you.
+  - For full sentences, ask Claude to call the `search_prompts` tool with a `values` object, or write the details in your next message.
+
   Example client config (or generate one with the MCP Config Generator tool):
 
   ```json

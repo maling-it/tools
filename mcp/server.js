@@ -99,10 +99,14 @@ export const createServer = async ({ timeoutMs = 15_000 } = {}) => {
     server.setRequestHandler(GetPromptRequestSchema, async (request) => {
         const prompt = PROMPTS.find((p) => p.id === request.params.name);
         if (!prompt) throw new Error(`Unknown prompt "${request.params.name}".`);
-        return {
-            description: prompt.title,
-            messages: [{ role: 'user', content: { type: 'text', text: fillTemplate(prompt.prompt, request.params.arguments ?? {}) } }]
-        };
+        let text = fillTemplate(prompt.prompt, request.params.arguments ?? {});
+        // Clients such as Claude Code pass one word per argument, so most placeholders usually stay open.
+        // Tell the model how to treat them instead of leaving it to guess.
+        const open = extractVariables(text);
+        if (open.length) {
+            text += `\n\n(Still open: ${open.map((name) => `{{${name}}}`).join(', ')}. Take these from what the user tells you in this conversation, and ask when you are unsure; do not invent them.)`;
+        }
+        return { description: prompt.title, messages: [{ role: 'user', content: { type: 'text', text } }] };
     });
 
     server.setRequestHandler(ListResourcesRequestSchema, async () => ({

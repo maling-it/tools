@@ -7,16 +7,7 @@
 
     const actions = $derived([
         { label: "Encode", transform: (value) => base64Encode(value, { urlSafe }) },
-        {
-            label: "Decode",
-            transform: (value) => {
-                try {
-                    return base64Decode(value);
-                } catch {
-                    throw new Error("Input is not valid Base64 encoded UTF-8 text.");
-                }
-            }
-        }
+        { label: "Decode", transform: base64Decode }
     ]);
 </script>
 

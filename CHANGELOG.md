@@ -13,6 +13,9 @@ All notable changes to Mools are documented here. The format follows [Keep a Cha
 - The sidebar markup is valid (dividers no longer sit directly inside the list), decorative logos have empty alt text, and the desktop Search button has an accessible name that matches its label.
 
 ### Fixed
+- **Friendlier agent tools.** Errors say what to fix instead of showing a bare parser message: invalid JSON, YAML or TOML names the format, Base64 and percent-encoding problems are explained, unit conversions list the valid units, and invalid Roman numerals, dates, cron expressions, times, SQL and bcrypt hashes are described. `cron_explain` (and the Crontab Generator page) showed no message at all, because the cron library throws plain strings; they are now proper errors.
+- Tools no longer answer with an empty response. `extract_data` says `No email addresses found.`, other tools explain an empty result, and anything else answers `(The result is empty.)`.
+- MCP prompts mark placeholders that are still open and tell the model to take them from the conversation or ask, because Claude Code passes one word per argument. The README explains how to use the prompts as slash commands.
 - A regular expression with catastrophic backtracking, for example `(a+)+$`, no longer freezes the browser tab. Regex Tester, Replace Text, Bulk File Find & Replace, the "Find and replace" operation of the Bulk Text Transformer and the rename rules of the Bulk File Renamer now run patterns in a Web Worker with a time limit of a few seconds. A pattern that takes too long is stopped with a clear message, and the tool keeps working. Plain (non-regex) searches run as before. ([#20](https://github.com/maling-it/tools/issues/20))
 
 ## [1.2.0] - 2026-11-15

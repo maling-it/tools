@@ -6,8 +6,14 @@ import { diffLines, diffWords } from 'diff';
 
 export const SQL_DIALECTS = ['sql', 'mysql', 'postgresql', 'sqlite', 'mariadb', 'transactsql', 'bigquery', 'plsql'];
 
-export const formatSql = (text, { language = 'sql', tabWidth = 2, keywordCase = 'upper' } = {}) =>
-    format(text, { language, tabWidth, keywordCase });
+export const formatSql = (text, { language = 'sql', tabWidth = 2, keywordCase = 'upper' } = {}) => {
+    try {
+        return format(text, { language, tabWidth, keywordCase });
+    } catch (error) {
+        // The parser's message continues with a dump of the token; the first line says what is wrong.
+        throw new Error(`Could not format the SQL: ${error.message.split('\n')[0].replace(/\s*Unexpected .*$/, '')}`.trim());
+    }
+};
 
 export const markdownToHtml = (markdown) => marked.parse(markdown, { async: false, gfm: true });
 
@@ -37,7 +43,12 @@ export const jsonDiff = (a, b) => {
 export const explainCron = (expression) => {
     const fields = expression.trim().split(/\s+/);
     if (fields.length !== 5) throw new Error('A cron expression has five fields: minute hour day-of-month month day-of-week.');
-    return cronstrue.toString(expression.trim(), { throwExceptionOnParseError: true, use24HourTimeFormat: true });
+    try {
+        return cronstrue.toString(expression.trim(), { throwExceptionOnParseError: true, use24HourTimeFormat: true });
+    } catch (error) {
+        // cronstrue throws plain strings such as "Error: minutes part must be >= 0 and <= 59".
+        throw new Error(`Invalid cron expression: ${String(error?.message ?? error).replace(/^Error:\s*/, '')}`);
+    }
 };
 
 const FIELD_RANGES = [[0, 59], [0, 23], [1, 31], [1, 12], [0, 7]];

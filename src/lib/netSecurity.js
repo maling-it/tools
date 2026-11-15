@@ -135,6 +135,9 @@ export const bcryptHash = async (password, rounds = 10) => {
 };
 
 export const bcryptCompare = async (password, hash) => {
+    if (!/^\$2[abxy]\$\d{2}\$[./A-Za-z0-9]{53}$/.test(hash.trim())) {
+        throw new Error('That does not look like a bcrypt hash. It starts with $2a$, $2b$, $2x$ or $2y$ followed by the cost and is 60 characters long.');
+    }
     const { default: bcrypt } = await import('bcryptjs');
     return bcrypt.compare(password, hash.trim());
 };
