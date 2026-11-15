@@ -1,5 +1,6 @@
 <script>
     import { copyToClipboard } from "#lib/textUtils.js";
+    import { announce } from "#lib/announce.svelte.js";
 
     let { items = [], title = "Results" } = $props();
 
@@ -7,6 +8,7 @@
 
     const copy = async (text, index) => {
         if (await copyToClipboard(text)) {
+            announce('Copied to clipboard');
             copiedIndex = index;
             setTimeout(() => (copiedIndex = -1), 1200);
         }

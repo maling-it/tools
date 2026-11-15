@@ -105,10 +105,10 @@
 
 <svelte:window onkeydown={onKeydown} />
 
-<nav class="sidebar offcanvas-start offcanvas-lg" tabindex="-1" id="sidebar">
+<nav class="sidebar offcanvas-start offcanvas-lg" tabindex="-1" id="sidebar" aria-label="Tools">
     <div class="offcanvas-header border-bottom border-secondary border-opacity-25">
         <a href="{base}/" class="sidebar-brand d-flex align-items-center me-auto">
-            <img src="{base}/favicon.png" alt="Logo" width="28" height="28" class="d-block flex-shrink-0 me-1" />
+            <img src="{base}/favicon.png" alt="" width="28" height="28" class="d-block flex-shrink-0 me-1" />
             Mools
         </a>
         <span class="d-none d-lg-inline-block">
@@ -136,7 +136,7 @@
         </div>
         <ul class="sidebar-nav">
             {#each groups as group (group.id)}
-                <hr class="sidebar-divider" />
+                <li aria-hidden="true"><hr class="sidebar-divider" /></li>
                 <li>
                     {#if group.id === "favorites"}
                         <span class="d-flex align-items-center" id="group-favorites-title">
@@ -149,7 +149,6 @@
                         type="button"
                         class="sidebar-group btn btn-link text-reset text-decoration-none d-flex align-items-center w-100 p-0 text-start"
                         aria-expanded={isOpen(group.id)}
-                        aria-controls="group-{group.id}"
                         onclick={() => toggleGroup(group.id)}
                     >
                         {#if group.icon}<i class="bi bi-{group.icon} me-1"></i>{/if}

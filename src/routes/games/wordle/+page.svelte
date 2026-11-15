@@ -6,6 +6,8 @@
     const LENGTH = 5;
     const TRIES = 6;
     const KEYS = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
+    // The state of a letter is also written out, so it does not depend on color alone.
+    const STATE_TEXT = { correct: "correct position", present: "in the word, wrong position", absent: "not in the word", typing: "typed", empty: "empty" };
 
     let answer = $state("");
     let guesses = $state([]);
@@ -78,7 +80,7 @@
 </svelte:head>
 
 <h1>Wordle</h1>
-<p class="text-body-secondary mb-3">Guess the five-letter word in six tries. Green is the right spot, yellow is in the word elsewhere. Any five letters are accepted as a guess.</p>
+<p class="text-body-secondary mb-3">Guess the five-letter word in six tries. Green with a ✓ is the right spot, yellow with a ~ is in the word elsewhere, and gray with a ✕ is not in the word. Any five letters are accepted as a guess.</p>
 
 <div class="mx-auto text-center" style="max-width: 24rem;">
     <div class="board mb-3" role="grid" aria-label="Wordle board">
@@ -86,7 +88,7 @@
             <div class="row-grid" role="row">
                 {#each { length: LENGTH } as __, col (col)}
                     {@const c = cell(row, col)}
-                    <div class="tile {c.state}" role="gridcell">{c.letter}</div>
+                    <div class="tile {c.state}" role="gridcell" aria-label={c.letter ? `${c.letter.toUpperCase()}, ${STATE_TEXT[c.state]}` : STATE_TEXT.empty}>{c.letter}</div>
                 {/each}
             </div>
         {/each}
@@ -109,7 +111,7 @@
                     <button class="key wide" type="button" onclick={() => press("enter")}>Enter</button>
                 {/if}
                 {#each [...keys] as letter (letter)}
-                    <button class="key {keyStates[letter] ?? ''}" type="button" onclick={() => press(letter)}>{letter}</button>
+                    <button class="key {keyStates[letter] ?? ''}" type="button" aria-label={keyStates[letter] ? `${letter.toUpperCase()}, ${STATE_TEXT[keyStates[letter]]}` : letter.toUpperCase()} onclick={() => press(letter)}>{letter}</button>
                 {/each}
                 {#if rowIndex === 2}
                     <button class="key wide" type="button" aria-label="Backspace" onclick={() => press("backspace")}><i class="bi bi-backspace"></i></button>
@@ -147,6 +149,33 @@
 
     .tile.typing {
         border-color: var(--bs-secondary-color);
+    }
+
+    /* A small symbol in each corner for people who cannot tell the colors apart. */
+    .tile {
+        position: relative;
+    }
+
+    .tile.correct::after,
+    .tile.present::after,
+    .tile.absent::after {
+        position: absolute;
+        top: 2px;
+        right: 5px;
+        font-size: 0.7rem;
+        font-weight: 700;
+    }
+
+    .tile.correct::after {
+        content: "✓";
+    }
+
+    .tile.present::after {
+        content: "~";
+    }
+
+    .tile.absent::after {
+        content: "✕";
     }
 
     .tile.correct,

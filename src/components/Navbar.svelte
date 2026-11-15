@@ -55,7 +55,7 @@
     });
 </script>
 
-<nav class="navbar navbar-expand-md mools-navbar sticky-top">
+<nav class="navbar navbar-expand-md mools-navbar sticky-top" aria-label="Site">
     <div class="container-md px-3 px-sm-4 px-xl-5 py-1 justify-content-start">
         <div class="btn-group me-3 d-lg-none">
             <button
@@ -63,6 +63,7 @@
                 data-bs-toggle="offcanvas"
                 data-bs-target="#sidebar"
                 class="btn btn-secondary btn-square"
+                aria-controls="sidebar"
                 aria-label="Toggle sidebar"
             >
                 <i class="bi bi-layout-sidebar" aria-hidden="true"></i>
@@ -76,7 +77,7 @@
         >
             <img
                 src="{base}/favicon.png"
-                alt="Logo"
+                alt=""
                 width="28"
                 height="28"
                 class="d-block flex-shrink-0 me-1"
@@ -116,8 +117,9 @@
             <div
                 class="d-flex align-items-center justify-content-center"
             >
-                <button type="button" class="btn btn-secondary me-2 d-none d-md-flex align-items-center" aria-label="Search tools" onclick={() => onsearch?.()}>
+                <button type="button" class="btn btn-secondary me-2 d-none d-md-flex align-items-center" aria-keyshortcuts="Control+K" onclick={() => onsearch?.()}>
                     <i class="bi bi-search" aria-hidden="true"></i>
+                    <span class="visually-hidden d-xl-none">Search tools</span>
                     <span class="ms-2 d-none d-xl-inline">Search</span>
                     <kbd class="ms-2 d-none d-xl-inline">Ctrl K</kbd>
                 </button>

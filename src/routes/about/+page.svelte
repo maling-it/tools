@@ -63,7 +63,7 @@
 <div class="text-center mb-5">
     <img src="{base}/favicon.png" width="120" class="mb-3" alt="Mools Logo">
     <h1 class="display-5 mb-3">About Mools</h1>
-    <p class="lead text-muted">
+    <p class="lead text-body-secondary">
         Making useful tools accessible to everyone, everywhere
     </p>
 </div>
@@ -103,7 +103,7 @@
                             </div>
                             <div>
                                 <h5 class="card-title mb-2">{feature.title}</h5>
-                                <p class="card-text text-muted">{feature.description}</p>
+                                <p class="card-text text-body-secondary">{feature.description}</p>
                             </div>
                         </div>
                     </div>
@@ -125,8 +125,8 @@
                             <i class="{member.icon} fs-1"></i>
                         </div>
                         <h5 class="card-title">{member.name}</h5>
-                        <p class="text-primary small fw-medium mb-2">{member.role}</p>
-                        <p class="card-text text-muted small">{member.description}</p>
+                        <p class="text-primary-emphasis small fw-medium mb-2">{member.role}</p>
+                        <p class="card-text text-body-secondary small">{member.description}</p>
                     </div>
                 </div>
             </div>
@@ -142,15 +142,15 @@
                 <i class="bi bi-gear me-2"></i>
                 Technology Stack
             </h3>
-            <p class="text-muted mb-3">
+            <p class="text-body-secondary mb-3">
                 Mools is built with modern, reliable technologies to ensure performance and maintainability.
             </p>
             <div class="row">
                 {#each techStack as tech}
                     <div class="col-md-6 mb-2">
                         <div class="d-flex align-items-center">
-                            <span class="badge bg-primary me-2">{tech.name}</span>
-                            <span class="small text-muted">{tech.description}</span>
+                            <span class="badge bg-body-secondary text-body me-2">{tech.name}</span>
+                            <span class="small text-body-secondary">{tech.description}</span>
                         </div>
                     </div>
                 {/each}
@@ -167,26 +167,26 @@
             <div class="row">
                 <div class="col-6 col-md-3">
                     <div class="stat-box">
-                        <div class="stat-number h3 text-primary">9+</div>
-                        <div class="stat-label small text-muted">Active Tools</div>
+                        <div class="stat-number h3 text-primary-emphasis">{tools.length}</div>
+                        <div class="stat-label small text-body-secondary">Active Tools</div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="stat-box">
-                        <div class="stat-number h3 text-success">3</div>
-                        <div class="stat-label small text-muted">Categories</div>
+                        <div class="stat-number h3 text-success-emphasis">{categories.length}</div>
+                        <div class="stat-label small text-body-secondary">Categories</div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="stat-box">
-                        <div class="stat-number h3 text-info">100%</div>
-                        <div class="stat-label small text-muted">Open Source</div>
+                        <div class="stat-number h3 text-info-emphasis">100%</div>
+                        <div class="stat-label small text-body-secondary">Open Source</div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="stat-box">
-                        <div class="stat-number h3 text-warning">0</div>
-                        <div class="stat-label small text-muted">Data Collected</div>
+                        <div class="stat-number h3 text-warning-emphasis">0</div>
+                        <div class="stat-label small text-body-secondary">Data Collected</div>
                     </div>
                 </div>
             </div>
@@ -205,14 +205,14 @@
             <div class="row">
                 <div class="col-md-6">
                     <h6 class="fw-bold">Feedback & Suggestions</h6>
-                    <p class="small text-muted mb-3">
+                    <p class="small text-body-secondary mb-3">
                         Have ideas for new tools or improvements? We'd love to hear from you! 
                         Your feedback helps us build better tools for everyone.
                     </p>
                 </div>
                 <div class="col-md-6">
                     <h6 class="fw-bold">Report Issues</h6>
-                    <p class="small text-muted mb-3">
+                    <p class="small text-body-secondary mb-3">
                         Found a bug or having trouble with a tool? Let us know so we can 
                         fix it quickly and improve the experience for all users.
                     </p>

@@ -116,7 +116,7 @@
                             </div>
                             <h5 class="card-title">{category.name}</h5>
                             <p class="card-text text-body-secondary small mb-2">{category.description}</p>
-                            <span class="badge bg-primary">{toolsIn(category.id).length} tools</span>
+                            <span class="badge bg-body-secondary text-body">{toolsIn(category.id).length} tools</span>
                         </div>
                     </div>
                 </a>

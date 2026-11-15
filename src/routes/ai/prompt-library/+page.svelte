@@ -2,6 +2,7 @@
     import { PROMPTS, PROMPT_CATEGORIES } from "#lib/prompts.js";
     import { extractVariables, fillTemplate } from "#lib/vibe.js";
     import { copyToClipboard } from "#lib/textUtils.js";
+    import { announce } from "#lib/announce.svelte.js";
 
     let query = $state("");
     let category = $state("All");
@@ -19,6 +20,7 @@
 
     const copy = async (prompt) => {
         if (await copyToClipboard(filled(prompt))) {
+            announce(`${prompt.title} prompt copied to clipboard`);
             copiedId = prompt.id;
             setTimeout(() => (copiedId = ""), 1200);
         }

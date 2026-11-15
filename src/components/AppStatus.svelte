@@ -1,5 +1,6 @@
 <script>
     import { onMount } from "svelte";
+    import { announcer } from "#lib/announce.svelte.js";
 
     let offline = $state(false);
     let waiting = $state();
@@ -45,6 +46,9 @@
 
     const update = () => waiting?.postMessage("SKIP_WAITING");
 </script>
+
+<!-- Short messages for screen readers (copied, added to favorites, results found...). -->
+<div class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">{announcer.message}</div>
 
 <div class="status-stack" aria-live="polite">
     {#if waiting}

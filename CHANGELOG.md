@@ -4,6 +4,14 @@ All notable changes to Mools are documented here. The format follows [Keep a Cha
 
 ## [Unreleased]
 
+### Added
+- **Accessibility pass (WCAG 2.1 AA).** A "Skip to main content" link and a `main` region, labelled navigation landmarks, a clear 3 pixel focus outline in every theme and style, and support for reduced motion. The command palette now follows the combobox pattern (`aria-activedescendant`, Home and End, focus kept inside, focus restored on close). Copying, favorites, palette results and live converter output are announced to screen readers. Wordle no longer relies on color alone. The accessibility statement describes what is covered and what is not.
+- Automated accessibility tests (axe-core) in the browser tests: all 128 pages in the light default style, a set of 12 pages in every other theme and style, and the open command palette. They run on every pull request.
+
+### Changed
+- Better contrast: secondary text and inline code in dark mode, the count badges on the home page, the technology badges and statistics on the About page. The About statistics now show the real number of tools and categories.
+- The sidebar markup is valid (dividers no longer sit directly inside the list), decorative logos have empty alt text, and the desktop Search button has an accessible name that matches its label.
+
 ### Fixed
 - A regular expression with catastrophic backtracking, for example `(a+)+$`, no longer freezes the browser tab. Regex Tester, Replace Text, Bulk File Find & Replace, the "Find and replace" operation of the Bulk Text Transformer and the rename rules of the Bulk File Renamer now run patterns in a Web Worker with a time limit of a few seconds. A pattern that takes too long is stopped with a clear message, and the tool keeps working. Plain (non-regex) searches run as before. ([#20](https://github.com/maling-it/tools/issues/20))
 

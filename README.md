@@ -73,7 +73,7 @@ bun run build    # static build into build/
 bun run preview  # serve the production build
 ```
 
-Pull requests run the unit tests, the build and the browser tests (`.github/workflows/ci.yml`). Pushes to `master` run the same checks and then deploy the site to GitHub Pages (`.github/workflows/deploy.yml`). The browser tests open every page in Chrome, so a broken page blocks the deploy.
+Pull requests run the unit tests, the build and the browser tests, including automated accessibility checks with axe-core (`.github/workflows/ci.yml`). Pushes to `master` run the same checks and then deploy the site to GitHub Pages (`.github/workflows/deploy.yml`). The browser tests open every page in Chrome, so a broken page blocks the deploy.
 
 The browser tests use the Google Chrome installed on your machine; set `CHROME_PATH` to use a different browser.
 
