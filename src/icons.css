@@ -168,6 +168,7 @@ url("../node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff?e34853135f9
 .bi-wifi::before { content: "\f61c"; }
 .bi-window::before { content: "\f620"; }
 .bi-x::before { content: "\f62a"; }
+.bi-bank::before { content: "\f62e"; }
 .bi-coin::before { content: "\f634"; }
 .bi-currency-bitcoin::before { content: "\f635"; }
 .bi-dash-lg::before { content: "\f63b"; }

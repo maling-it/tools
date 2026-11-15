@@ -13,6 +13,7 @@ import { HTTP_STATUS, MIME_TYPES } from './reference.js';
 import { PROMPTS } from './prompts.js';
 import { COMMIT_TYPES, RULE_FORMATS, buildCommitMessage, buildDesignMd, buildLlmsTxt, buildMcpConfig, buildPrompt, buildRulesFile, estimateCost, estimateTokens, extractVariables, fillTemplate } from './vibe.js';
 import { LINE_OPERATIONS, EXTRACTORS, chunkText, extractData, planRename, renameScript, runBulk, splitCsv } from './bulk.js';
+import { buildGitignore, dockerRunToComposeText, ibanReport, jsonToSchema, GITIGNORE_TEMPLATES } from './backlog.js';
 import { caseConverters, escapeHtml, escapeJs, escapeXml, replaceText, textStats, unescapeHtml, unescapeJs, unescapeXml, urlDecode, urlEncode } from './textUtils.js';
 
 const string = (description, extra = {}) => ({ type: 'string', description, ...extra });
@@ -641,6 +642,30 @@ export const agentTools = [
             const { default: QRCode } = await import('qrcode');
             return QRCode.toString(text, { type: 'svg', errorCorrectionLevel });
         }
+    },
+    {
+        name: 'validate_iban',
+        description: 'Check one or more IBANs (one per line) for country, length and check digits.',
+        inputSchema: object({ text: string('IBANs, one per line. Spaces and case are ignored') }),
+        run: ({ text }) => ibanReport(text)
+    },
+    {
+        name: 'json_to_schema',
+        description: 'Infer a JSON Schema (draft 2020-12) from a sample JSON document.',
+        inputSchema: object({ text: string('Sample JSON'), required: bool('Mark every key found as required, default true'), formats: bool('Detect formats such as date, email, uri and uuid, default true') }, ['text']),
+        run: withJsonErrors(({ text, required = true, formats = true }) => jsonToSchema(text, { required, formats }))
+    },
+    {
+        name: 'docker_run_to_compose',
+        description: 'Convert a docker run command into a docker-compose.yml.',
+        inputSchema: object({ command: string('The docker run command, for example "docker run -d -p 8080:80 nginx"') }),
+        run: ({ command }) => dockerRunToComposeText(command)
+    },
+    {
+        name: 'build_gitignore',
+        description: `Generate a .gitignore from template names. Available: ${Object.keys(GITIGNORE_TEMPLATES).join(', ')}.`,
+        inputSchema: object({ templates: string('Template names separated by commas or spaces, for example "node, macos, vscode"') }),
+        run: ({ templates }) => buildGitignore(templates)
     }
 ];
 

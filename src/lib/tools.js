@@ -1005,6 +1005,42 @@ export const tools = [
         description: 'Test your Telegram bot with messages, photos and documents',
         icon: 'chat-dots',
         features: ['Messages', 'Photos', 'Documents', 'cURL Export']
+    },
+    {
+        category: 'security',
+        slug: 'iban-validator',
+        title: 'IBAN Validator',
+        sidebarName: 'IBAN Validator',
+        description: 'Check IBANs for the right length and check digits, one per line',
+        icon: 'bank',
+        features: ['Mod-97 Check', 'Country Lengths', 'Bulk Check']
+    },
+    {
+        category: 'converter',
+        slug: 'json-to-schema',
+        title: 'JSON Schema Generator',
+        sidebarName: 'JSON Schema',
+        description: 'Infer a JSON Schema from a sample JSON document',
+        icon: 'diagram-3',
+        features: ['Draft 2020-12', 'Formats', 'Required Keys']
+    },
+    {
+        category: 'converter',
+        slug: 'docker-run-to-compose',
+        title: 'Docker Run to Compose',
+        sidebarName: 'Docker to Compose',
+        description: 'Turn a docker run command into a docker-compose.yml',
+        icon: 'box-seam',
+        features: ['Ports and Volumes', 'Environment', 'Networks']
+    },
+    {
+        category: 'generator',
+        slug: 'gitignore-generator',
+        title: '.gitignore Generator',
+        sidebarName: '.gitignore',
+        description: 'Build a .gitignore for your languages, editors and systems',
+        icon: 'git',
+        features: ['Languages', 'Editors', 'Operating Systems']
     }
 ].map((tool) => ({ ...tool, path: `/${tool.category}/${tool.slug}` }));
 
