@@ -27,6 +27,7 @@ url("../node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff?e34853135f9
 }
 
 .bi-123::before { content: "\f67f"; }
+.bi-app-indicator::before { content: "\f10a"; }
 .bi-app::before { content: "\f10b"; }
 .bi-arrow-down::before { content: "\f128"; }
 .bi-arrow-left-right::before { content: "\f12b"; }
