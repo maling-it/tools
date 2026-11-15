@@ -73,3 +73,20 @@ jobs:
             --title "Mools ${GITHUB_REF_NAME#v}" \
             --notes-file release-notes.md \
             $FLAGS
+
+      # Refresh the wiki's Tool Catalog and the counts on its Home page. Nothing is pushed when nothing changed.
+      - name: Update the wiki
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git" wiki
+          node scripts/wiki-catalog.mjs wiki
+          cd wiki
+          if git diff --quiet; then
+            echo "The wiki is already up to date."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -am "Update the Tool Catalog for $GITHUB_REF_NAME"
+            git push
+          fi
