@@ -5,7 +5,7 @@
 <h1 align="center">Mools</h1>
 
 <p align="center">
-  <strong>119 free developer tools that run in your browser.</strong><br />
+  <strong>123 free developer tools that run in your browser.</strong><br />
   Text, converters, bulk tools, security, SEO, generators, calculators, games and helpers for coding with AI.
 </p>
 
@@ -98,7 +98,7 @@ docs/             logo and screenshots used by this README
 
 Mools is built to be used by AI agents as well as people:
 
-- **`/llms.txt`**, **`/tools.json`** and **`/sitemap.xml`** are generated from `src/lib/tools.js` at build time. `tools.json` also lists the JSON Schema of every callable tool (83 of them).
+- **`/llms.txt`**, **`/tools.json`** and **`/sitemap.xml`** are generated from `src/lib/tools.js` at build time. `tools.json` also lists the JSON Schema of every callable tool (88 of them).
 - **WebMCP**: in browsers that support `navigator.modelContext`, every tool in `src/lib/agentTools.js` is registered on each page, so in-browser agents can call them directly.
 - **MCP server**: `bun run mcp` starts a stdio MCP server (`mcp/server.js`). It provides:
   - **Tools**: every tool in `src/lib/agentTools.js`, annotated as read-only. Tools that parse HTML or XML use `jsdom` (an optional dependency); without it they are left out.

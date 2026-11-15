@@ -1041,6 +1041,42 @@ export const tools = [
         description: 'Build a .gitignore for your languages, editors and systems',
         icon: 'git',
         features: ['Languages', 'Editors', 'Operating Systems']
+    },
+    {
+        category: 'string',
+        slug: 'email-normalizer',
+        title: 'Email Normalizer',
+        sidebarName: 'Email Normalizer',
+        description: 'Clean up email lists: lowercase, remove +tags and Gmail dots, drop duplicates',
+        icon: 'envelope-check',
+        features: ['Lowercase', 'Plus Tags', 'Gmail Dots', 'De-duplicate']
+    },
+    {
+        category: 'converter',
+        slug: 'css-minifier',
+        title: 'CSS Minifier',
+        sidebarName: 'CSS Minifier',
+        description: 'Shrink CSS by removing comments and whitespace',
+        icon: 'file-earmark-zip',
+        features: ['Comments', 'Whitespace', 'Hex Colors']
+    },
+    {
+        category: 'security',
+        slug: 'rsa-key-generator',
+        title: 'RSA Key Pair Generator',
+        sidebarName: 'RSA Keys',
+        description: 'Generate an RSA key pair as PEM in your browser',
+        icon: 'key',
+        features: ['2048 to 4096 bits', 'PKCS#8 and SPKI', 'Web Crypto']
+    },
+    {
+        category: 'generator',
+        slug: 'mac-address-generator',
+        title: 'MAC Address Generator',
+        sidebarName: 'MAC Address',
+        description: 'Generate random MAC addresses and convert them between notations',
+        icon: 'ethernet',
+        features: ['Random Addresses', 'Four Notations', 'Unicast and Multicast']
     }
 ].map((tool) => ({ ...tool, path: `/${tool.category}/${tool.slug}` }));
 

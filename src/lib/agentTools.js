@@ -14,6 +14,7 @@ import { PROMPTS } from './prompts.js';
 import { COMMIT_TYPES, RULE_FORMATS, buildCommitMessage, buildDesignMd, buildLlmsTxt, buildMcpConfig, buildPrompt, buildRulesFile, estimateCost, estimateTokens, extractVariables, fillTemplate } from './vibe.js';
 import { LINE_OPERATIONS, EXTRACTORS, chunkText, extractData, planRename, renameScript, runBulk, splitCsv } from './bulk.js';
 import { buildGitignore, dockerRunToComposeText, ibanReport, jsonToSchema, GITIGNORE_TEMPLATES } from './backlog.js';
+import { MAC_FORMATS, formatMac, generateMacs, generateRsaKeyPair, macReport, minifyCss, normalizeEmails, parseMac } from './utilities.js';
 import { caseConverters, escapeHtml, escapeJs, escapeXml, replaceText, textStats, unescapeHtml, unescapeJs, unescapeXml, urlDecode, urlEncode } from './textUtils.js';
 
 const string = (description, extra = {}) => ({ type: 'string', description, ...extra });
@@ -666,6 +667,39 @@ export const agentTools = [
         description: `Generate a .gitignore from template names. Available: ${Object.keys(GITIGNORE_TEMPLATES).join(', ')}.`,
         inputSchema: object({ templates: string('Template names separated by commas or spaces, for example "node, macos, vscode"') }),
         run: ({ templates }) => buildGitignore(templates)
+    },
+    {
+        name: 'normalize_emails',
+        description: 'Normalize a list of email addresses: lowercase, remove +tags and Gmail dots, drop duplicates. Invalid entries are listed as comment lines.',
+        inputSchema: object({ text: string('Emails separated by new lines, commas or semicolons'), removeTags: bool('Remove +tags, default true'), gmailDots: bool('Remove dots in Gmail names, default true'), dedupe: bool('Drop duplicates, default true') }, ['text']),
+        run: ({ text, ...options }) => normalizeEmails(text, options)
+    },
+    {
+        name: 'minify_css',
+        description: 'Minify CSS by removing comments and whitespace.',
+        inputSchema: object({ css: string('CSS source') }),
+        run: ({ css }) => minifyCss(css)
+    },
+    {
+        name: 'generate_mac_addresses',
+        description: 'Generate random MAC addresses. By default they are locally administered unicast addresses, which never clash with real hardware.',
+        inputSchema: object({ count: number('How many, 1 to 100, default 5', { minimum: 1, maximum: 100 }), format: string('Notation, default colon', { enum: MAC_FORMATS }), uppercase: bool('Uppercase hex digits'), local: bool('Locally administered, default true'), unicast: bool('Unicast, default true') }, []),
+        run: ({ count = 5, ...options }) => generateMacs(count, options).join('\n')
+    },
+    {
+        name: 'format_mac_address',
+        description: 'Convert MAC addresses (one per line, any notation) to colon, hyphen and Cisco dot notation and say whether each is unicast or multicast.',
+        inputSchema: object({ text: string('MAC addresses, one per line'), format: string('Return only this notation instead of the report', { enum: MAC_FORMATS }), uppercase: bool('Uppercase, with format') }, ['text']),
+        run: ({ text, format, uppercase }) => (format ? text.split(/\r?\n/).filter((l) => l.trim()).map((l) => formatMac(parseMac(l), { format, uppercase })).join('\n') : macReport(text))
+    },
+    {
+        name: 'generate_rsa_key_pair',
+        description: 'Generate an RSA key pair and return the private key (PKCS#8 PEM) and public key (SPKI PEM). Use it for tests, not for secrets that matter.',
+        inputSchema: object({ bits: number('Key size: 2048 or 3072, default 2048', { enum: [2048, 3072] }), usage: string('"sign" (default) or "encrypt"', { enum: ['sign', 'encrypt'] }) }, []),
+        run: async ({ bits = 2048, usage = 'sign' }) => {
+            const { privateKey, publicKey } = await generateRsaKeyPair({ bits, usage });
+            return `${publicKey}\n${privateKey}`;
+        }
     }
 ];
 
