@@ -7,7 +7,7 @@ import zlib from 'node:zlib';
 const BUILD = 'build';
 const KB = 1024;
 // Budgets in gzipped KB. Raise them on purpose, not by accident.
-const BUDGETS = { 'index.html': { js: 75, css: 75 }, 'converter/json-formatter/index.html': { js: 80, css: 75 }, default: { js: 175, css: 75 } };
+const BUDGETS = { 'index.html': { js: 75, css: 55 }, 'converter/json-formatter/index.html': { js: 80, css: 55 }, default: { js: 175, css: 55 } };
 
 const gz = (file) => zlib.gzipSync(fs.readFileSync(path.join(BUILD, file))).length;
 const pages = [];

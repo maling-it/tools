@@ -1,7 +1,7 @@
 <script>
     import "halfmoon/css/halfmoon.min.css";
     import "halfmoon/css/cores/halfmoon.cores.css";
-    import "bootstrap-icons/font/bootstrap-icons.css";
+    import "../icons.css";
     import "../app.css";
     import { onMount } from "svelte";
     import { page } from "$app/state";
